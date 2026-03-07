@@ -1,0 +1,62 @@
+# Evaluation Report
+This report documents the systematic evaluation of the visualization prototype developed in the [Visual Encoding and Design](viz_design_report.qmd) phase against the project objectives and success criteria defined in the [Project Charta](project_charta.qmd).
+
+## Evaluation Setup
+
+### Evaluation Objectives
+State what the evaluation aims to assess. Reference the success criteria from the Project Charta and map them to the three value dimensions:
+
+* **Cognitive and analytical value**: Can users effectively accomplish the intended analytical tasks (detect patterns, compare values, identify outliers, etc.)?
+* **Communicative value**: Does the visualization successfully convey its message to the target audiences with varying levels of data literacy?
+* **Experiential and aesthetic value**: Do users perceive the product as engaging, trustworthy and usable?
+
+### Evaluation Method
+Describe the evaluation method(s) used. Common approaches for visualization products include:
+
+* **Heuristic evaluation**: Expert review based on established visualization design principles (e.g. Munzner's design guidelines, Tufte's principles, Nielsen's usability heuristics adapted for visualization).
+* **User testing**: Task-based usability tests with representative users from the target segments identified in the user analysis. Document the tasks, think-aloud protocol, observation setup, etc.
+* **Questionnaire-based evaluation**: Standardised instruments such as the System Usability Scale (SUS), NASA-TLX for task load, or custom questionnaires aligned with the success criteria.
+* **Insight-based evaluation**: Analysis of the quantity, quality and depth of insights users derive from the visualization within a given time frame.
+* **Comparative evaluation**: Side-by-side comparison with the current approach (baseline) or alternative designs.
+
+### Participants
+If user testing or questionnaire-based evaluation was conducted, describe the participants:
+
+* Number of participants per user segment
+* Relevant characteristics (domain expertise, data literacy, familiarity with similar tools)
+* Recruitment method
+
+## Results
+Summarise the evaluation results structured by success criteria. For each criterion, report:
+
+* The observed outcome (qualitative observations, quantitative metrics)
+* Whether the target value was met
+* Notable findings, unexpected observations or edge cases
+
+Use tables, charts or annotated screenshots where they support clarity.
+
+## Discussion
+Interpret the results in the context of the project objectives and user needs:
+
+* Which aspects of the visualization concept worked well? Which user pains were effectively relieved, which gains were created?
+* Where did the design fall short of expectations? What are possible explanations?
+* Are there trade-offs between the three value dimensions (e.g. analytical depth vs. accessibility for non-expert users)?
+* What are the limitations of the evaluation itself (e.g. small sample size, lab vs. field conditions, prototype fidelity constraints)?
+
+## Checkpoint Decision
+Document the decision taken by the project team and stakeholders based on the evaluation results:
+
+* **Proceed to deployment**: The prototype meets the success criteria and is ready for deployment (with or without minor adjustments).
+* **Iterate**: An additional design iteration is needed. Specify which aspects require reworking:
+    * Revised or additional data acquisition
+    * Changes to visual encoding or interaction design
+    * Adjustments to layout, narrative or visual style
+    * Addressing accessibility, performance or governance issues
+* **Discontinue**: The project objectives cannot be met with the current approach. Document the rationale.
+
+Record who participated in the decision and when it was taken.
+
+## Additional Requirements and Deployment Planning
+If the decision is to proceed to deployment, document any additional requirements that emerged from the evaluation (e.g. features requested by users, data refresh needs, access control) and outline the plan for the [Deployment](deployment.qmd) phase.
+
+Any presentation material created for evaluation workshops should be stored in the `docs` folder.

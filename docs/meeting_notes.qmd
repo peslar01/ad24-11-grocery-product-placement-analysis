@@ -1,0 +1,44 @@
+# Meeting Notes
+
+Notes and decisions from the coaching sessions. You might also want to include notes from internal team meetings here, e.g. to document decisions that are relevant for the project and the development of the visualisation product. Sort in reverse chronological order (most recent first).
+
+
+## 14.04.2022
+
+Topics:
+
+* topic 1
+* topic 2
+* ...
+
+Decisions:
+
+* decision 1
+* decision 2
+* ...
+
+Next steps:
+
+* this
+* and that
+* ...
+
+## 07.04.2022
+
+Topics:
+
+* topic 1
+* topic 2
+* ...
+
+Decisions:
+
+* decision 1
+* decision 2
+* ...
+
+Next steps:
+
+* this
+* and that
+* ...

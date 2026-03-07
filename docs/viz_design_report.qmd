@@ -1,0 +1,70 @@
+# Visualization Design Report
+This report documents the visual encoding and design decisions made during the development of the visualization product. It translates the visualization concept outlined in the [Project Charta](project_charta.qmd) into concrete design specifications and documents the resulting prototype(s).
+
+## Design Overview
+Briefly summarise the visualization concept from the Project Charta and describe any refinements or changes that emerged during the design process. Reference the project objectives and user needs that drive the design.
+
+## Data-to-Visual Mapping
+Document the mapping of data variables to visual channels. For each view or chart in the visualization product, describe:
+
+* **Data variables**: Which variables from the processed datasets (see [Data Report](data_report.qmd)) are represented?
+* **Marks**: What geometric primitives are used to represent data items – points, lines, areas, volumes?
+* **Visual channels**: How are data attributes encoded – position, length, angle, area, colour hue, colour saturation, brightness, shape, orientation, texture?
+* **Scale and axis design**: What scales are used (linear, logarithmic, categorical, temporal)? How are axes labelled and annotated?
+* **Colour design**: What colour palette is used and why? Consider colour-blindness accessibility (e.g. using `viridis`, `ColorBrewer` palettes) and semantic colour mappings (e.g. red for negative, green for positive).
+
+A tabular overview can help provide a quick summary:
+
+: Data-to-visual mapping overview. {#tbl-encoding-overview}
+
+| View / Chart | Data variables | Mark type | Visual channels | Scale |
+|---|---|---|---|---|
+| e.g. Sales by Region | region (cat.), revenue (quant.) | bar | x-position, length, colour hue | categorical, linear |
+| ... | ... | ... | ... | ... |
+
+## Layout and Composition
+Describe how individual views are composed into the overall visualization product:
+
+* **Spatial arrangement**: How are views arranged on the screen or page? Grid layout, free-form, scrollable narrative, etc.
+* **Coordination between views**: Are views linked (e.g. brushing and linking, shared filters, coordinated highlighting)?
+* **Hierarchy and navigation**: How does the user navigate between different levels of detail or different thematic sections?
+* **Responsive design**: How does the layout adapt to different screen sizes and devices, if applicable?
+
+Include annotated wireframes or layout sketches to illustrate the composition.
+
+## Interaction Design
+If the visualization product includes interactive elements, document them here:
+
+* **Interaction techniques**: Selection, filtering, zooming, panning, brushing, details-on-demand, drill-down, etc.
+* **Input modalities**: Mouse, touch, keyboard shortcuts, search fields, etc.
+* **State management**: How does the system respond to user interactions? What state transitions occur?
+* **Feedback and transitions**: How are changes communicated to the user – animations, highlighting, progressive disclosure?
+
+For each interaction, describe which user task (from the user analysis in the Project Charta) it supports and how it contributes to the cognitive, communicative or experiential value of the product.
+
+## Visual Style and Aesthetics
+Document the overall visual design language:
+
+* **Typography**: Font families, sizes, hierarchy of text elements (titles, labels, annotations, body text).
+* **Colour palette**: Primary and secondary colours, background, accent colours. Provide colour codes (hex/RGB).
+* **Spacing and alignment**: Grid system, margins, padding, whitespace strategy.
+* **Branding**: Integration of organisational identity, logos, visual style guides, if applicable.
+* **Accessibility**: Considerations for colour-blindness, contrast ratios, screen reader compatibility, font legibility.
+
+## Prototype Description
+Document the developed prototype(s):
+
+* **Prototype fidelity**: Low-fidelity (sketches, wireframes), medium-fidelity (static mockups), high-fidelity (interactive implementation)?
+* **Screenshots and/or link**: Include representative screenshots of the prototype. If the prototype is accessible online, provide the URL.
+* **Technology stack**: Tools, libraries and frameworks used for implementation (e.g. D3.js, Plotly, Tableau, Power BI, Streamlit, Observable, etc.).
+* **Code and version control**: Link to the code repository, branch or tag corresponding to the current prototype version.
+
+## Design Rationale and Iterations
+Document key design decisions, alternatives considered and the rationale for the chosen approach. This section ensures traceability and supports the evaluation phase.
+
+* **Design alternatives**: What alternative designs were considered? Sketches, mockups or descriptions of discarded approaches can be valuable for documentation.
+* **Design rationale**: Why was the chosen design preferred? Reference the project objectives, user needs (jobs, pains, gains) and the three value dimensions (cognitive, communicative, experiential).
+* **Iteration history**: If the design evolved through multiple iterations (e.g. based on informal feedback or internal reviews), briefly describe the key changes and their motivation.
+
+## Conclusions and Next Steps
+Summarise the key design decisions and their expected impact on the project objectives. Identify open questions, known limitations of the current prototype and topics to be addressed in the [Evaluation](evaluation.qmd) phase.

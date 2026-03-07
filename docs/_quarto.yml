@@ -1,0 +1,41 @@
+project:
+  type: website
+  output-dir: build
+
+lang: en
+language:
+  section-title-appendices: "Appendix"
+
+website:
+  title: "Sample Project"
+  search: true
+  sidebar:
+    style: "floating"
+    search: true
+    contents:
+      - index.qmd
+      - project_charta.qmd
+      - data_report.qmd
+      - viz_design_report.qmd
+      - evaluation.qmd
+      - meeting_notes.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+      
+
+number-sections: true
+
+bibliography: refs.bib
+csl: vancouver-brackets.csl
+
+jupyter: python3
+
+execute:
+  freeze: auto
+
+editor:
+  render-on-save: true
