@@ -198,7 +198,7 @@ Divide the project into individual phases, describe them briefly and draw up a p
 gantt
     title Optimising Product Placement Using Grocery Purchase Data
     dateFormat YYYY-MM-DD
-    tickInterval 5day
+    tickInterval 10day
 
     section Project Understanding
         Context analysis & research        :a1, 2026-03-20, 3d
