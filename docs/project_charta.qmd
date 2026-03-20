@@ -197,39 +197,39 @@ Divide the project into individual phases, describe them briefly and draw up a p
 %%| fig-cap: Preliminary project plan in the form of a Gantt chart.
 gantt
     title Optimising Product Placement Using Grocery Purchase Data
-    dateFormat YYYY-MM-DD
+    dateFormat MM-DD
     tickInterval 7day
 
     section Project Understanding
-        Research & Context        :a1, 2026-03-20, 3d
-        Stakeholders & Users      :a2, 2026-03-23, 4d
-        Situation Analysis        :a3, 2026-03-27, 2d
-        Charta Finalised          : milestone, m1, 2026-03-29, 1d
+        Research & Context        :a1, 03-20, 3d
+        Stakeholders & Users      :a2, 03-23, 4d
+        Situation Analysis        :a3, 03-27, 2d
+        Charta Finalised          : milestone, m1, 03-29, 1d
 
     section Data Exploration
-        Data Cleaning             :a4, 2026-03-30, 5d
-        EDA                       :a5, 2026-04-04, 7d
-        Key Insights              :a6, 2026-04-11, 3d
-        Data Report               : milestone, m2, 2026-04-14, 1d
+        Data Cleaning             :a4, 03-30, 5d
+        EDA                       :a5, 04-04, 7d
+        Key Insights              :a6, 04-11, 3d
+        Data Report               : milestone, m2, 04-14, 1d
 
     section Visual Design
-        Concept Design            :a7, 2026-04-15, 4d
-        Prototyping               :a8, 2026-04-19, 7d
-        Dashboard / Data Story    :a9, 2026-04-26, 10d
-        Review & Iteration        :a10, 2026-05-06, 4d
+        Concept Design            :a7, 04-15, 4d
+        Prototyping               :a8, 04-19, 7d
+        Dashboard / Data Story    :a9, 04-26, 10d
+        Review & Iteration        :a10, 05-06, 4d
 
     section Evaluation
-        Testing                   :a11, 2026-05-10, 5d
-        Improvements              :a12, 2026-05-15, 5d
+        Testing                   :a11, 05-10, 5d
+        Improvements              :a12, 05-15, 5d
 
     section Deployment
-        Documentation             :a13, 2026-05-20, 5d
-        Publishing                :a14, 2026-05-25, 2d
+        Documentation             :a13, 05-20, 5d
+        Publishing                :a14, 05-25, 2d
 
     section Presentation
-        Slides                    :a15, 2026-05-27, 3d
-        Rehearsal                 :a16, 2026-05-30, 2d
-        Final Presentation        : milestone, m3, 2026-06-01, 1d
+        Slides                    :a15, 05-27, 3d
+        Rehearsal                 :a16, 05-30, 2d
+        Final Presentation        : milestone, m3, 06-01, 1d
 ```
 
 See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html). It might not be displayed correctly in Safari &#8594; use Chrome. [Live editor with export functionality](https://mermaid.live/)
