@@ -235,7 +235,6 @@ gantt
 See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html). It might not be displayed correctly in Safari &#8594; use Chrome. [Live editor with export functionality](https://mermaid.live/)
 
 ## Roles and Contact Details
-## Roles and Contact Details
 
 | Name                     | Role           | Responsibilities                                        | Contact                            |
 |--------------------------|---------------|----------------------------------------------------------|------------------------------------|
