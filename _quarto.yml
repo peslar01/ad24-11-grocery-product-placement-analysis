@@ -1,0 +1,16 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "AD24 FancyProject"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: eda/graph-plot.qmd
+        text: Graph Analyse
+
+format:
+  html:
+    jupyter: python3
