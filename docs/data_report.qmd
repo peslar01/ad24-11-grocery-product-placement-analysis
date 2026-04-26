@@ -1,41 +1,5 @@
 # Data Report
 
-```{python}
-#| label: setup
-#| echo: false
-
-from pathlib import Path
-import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.ticker import FuncFormatter
-import seaborn as sns
-
-project_root = Path().resolve().parent
-data_dir = project_root / "data"
-
-required_files = [
-    "orders.csv",
-    "products.csv",
-    "aisles.csv",
-    "departments.csv",
-    "order_products__prior.csv",
-]
-
-missing_files = [f for f in required_files if not (data_dir / f).exists()]
-
-if missing_files:
-    print("Data files are not available in this environment.")
-    print("Missing files:", missing_files)
-    print("This section is skipped during GitHub Actions rendering.")
-else:
-    orders = pd.read_csv(data_dir / "orders.csv")
-    products = pd.read_csv(data_dir / "products.csv")
-    aisles = pd.read_csv(data_dir / "aisles.csv")
-    departments = pd.read_csv(data_dir / "departments.csv")
-    order_products = pd.read_csv(data_dir / "order_products__prior.csv")
-```
-
 All information on the data used in this project is compiled in the data report to ensure traceability and reproducibility of the results.
 
 During exploratory data analysis, data quality issues and structural characteristics are identified, which may require preprocessing, merging of datasets and feature engineering. The processed data described in this report serves as the foundation for the subsequent visualisation design and implementation.
@@ -92,207 +56,21 @@ All other relevant tables are complete and contain no missing values. Overall, t
 
 ### Quantity and Time Analysis
 
-Since the dataset does not contain explicit product quantities per order, quantity is interpreted as the number of orders and product occurrences over time. This section analyses when customers place orders and how purchasing activity is distributed across days and hours.
+Since the dataset does not contain explicit product quantities per order, quantity is approximated by the number of orders and product occurrences over time. This section therefore analyses when customers place orders and how purchasing activity is distributed across days and hours.
 
-```{python}
-#| label: fig-orders-hour
-#| fig-cap: "Number of orders by hour of day. Peak hours (9–15) are highlighted."
-#| echo: false
+![Number of orders by hour of day. Peak hours between 9:00 and 15:00 are highlighted.](pics/orders_by_hour.png){#fig-orders-hour}
 
-if not missing_files:
+The results show a clear daily pattern. Most orders are placed between 9:00 and 15:00, indicating a strong peak in activity during daytime hours, while activity remains very low during the night.
 
-    orders_by_hour = orders.groupby("order_hour_of_day")["order_id"].count()
+![Number of orders by day of week.](pics/orders_by_day.png){#fig-orders-day}
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+On a weekly level, order activity is highest on Sundays and Mondays. This suggests that customers tend to plan and complete their grocery shopping at the beginning of the week.
 
-    peak_color = "#2F75B5"
-    offpeak_color = "#D9D9D9"
+![Order activity by day of week and hour of day.](pics/orders_heatmap.png){#fig-orders-heatmap}
 
-    colors = [
-        peak_color if 9 <= hour <= 15 else offpeak_color
-        for hour in orders_by_hour.index
-    ]
+As shown in @fig-orders-heatmap, these temporal patterns combine into a consistent structure. The highest concentration of orders occurs on Sundays and Mondays during late morning and early afternoon.
 
-    ax.bar(
-        orders_by_hour.index,
-        orders_by_hour.values,
-        color=colors,
-        width=0.75,
-        edgecolor="white",
-        linewidth=0.8
-    )
-
-    ax.set_title("Orders by Hour of Day", fontsize=18, fontweight="bold", pad=16)
-    ax.set_xlabel("Hour of day", fontsize=12)
-    ax.set_ylabel("Number of orders", fontsize=12)
-
-    ax.set_xticks(range(0, 24, 1))
-    ax.set_xlim(-0.8, 23.8)
-
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x):,}"))
-    ax.yaxis.grid(True, linestyle="--", linewidth=0.8, alpha=0.45)
-    ax.set_axisbelow(True)
-
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-
-    legend_elements = [
-        Patch(
-            facecolor=peak_color,
-            edgecolor="white",
-            label="Peak hours (9:00–15:00)\n(highest order activity)"
-        ),
-        Patch(
-            facecolor=offpeak_color,
-            edgecolor="white",
-            label="Off-peak hours"
-        )
-    ]
-
-    ax.legend(
-        handles=legend_elements,
-        loc="upper right",
-        frameon=True,
-        framealpha=0.95,
-        facecolor="white",
-        edgecolor="#CCCCCC"
-    )
-
-    plt.tight_layout()
-    plt.show()
-
-else:
-    print("⚠️ Plot skipped: data not available in this environment.")
-```
-Most orders are placed between 9:00 and 15:00, indicating a clear daily activity peak during daytime hours. Activity is very low during the night.
-
-```{python}
-#| label: fig-orders-day
-#| fig-cap: "Number of orders by day of week."
-#| echo: false
-
-#| label: fig-orders-day
-#| fig-cap: "Number of orders by day of week. Sunday and Monday show the highest order activity."
-#| echo: false
-
-if not missing_files:
-    # Prepare data
-    orders_by_day = orders.groupby("order_dow")["order_id"].count()
-    orders_by_day.index = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
-    fig, ax = plt.subplots(figsize=(9, 5))
-
-    # Define colors
-    peak_color = "#2F75B5"
-    offpeak_color = "#D9D9D9"
-
-    colors = [
-        peak_color if day in ["Sunday", "Monday"] else offpeak_color
-        for day in orders_by_day.index
-    ]
-
-    # Plot
-    ax.bar(
-        orders_by_day.index,
-        orders_by_day.values,
-        color=colors,
-        width=0.7,
-        edgecolor="white",
-        linewidth=0.8
-    )
-
-    # Labels and title
-    ax.set_title("Orders by Day of Week", fontsize=18, fontweight="bold", pad=16)
-    ax.set_xlabel("Day of week", fontsize=12)
-    ax.set_ylabel("Number of orders", fontsize=12)
-
-    # Format y-axis with comma separators
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x):,}"))
-
-    # Gridlines
-    ax.yaxis.grid(True, linestyle="--", linewidth=0.8, alpha=0.45)
-    ax.set_axisbelow(True)
-
-    # Clean style
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-
-    # Legend
-    legend_elements = [
-        Patch(
-            facecolor=peak_color,
-            edgecolor="white",
-            label="Peak days: Sunday and Monday\n(highest order activity)"
-        ),
-        Patch(
-            facecolor=offpeak_color,
-            edgecolor="white",
-            label="Other days"
-        )
-    ]
-
-    ax.legend(
-        handles=legend_elements,
-        loc="upper right",
-        frameon=True,
-        framealpha=0.95,
-        facecolor="white",
-        edgecolor="#CCCCCC"
-    )
-
-    # Improve x-label readability
-    plt.xticks()
-
-    plt.tight_layout()
-    plt.show()
-
-else:
-    print("⚠️ Plot skipped: data not available in this environment.")
-```
-Order activity is highest on Sundays and Mondays, suggesting that customers tend to plan their grocery purchases at the beginning of the week.
-```{python}
-#| label: fig-orders-heatmap
-#| fig-cap: "Order frequency by day of week and hour of day."
-#| echo: false
-
-if not missing_files:
-    # Prepare data for heatmap
-    heatmap_data = orders.groupby(
-        ["order_dow", "order_hour_of_day"]
-    )["order_id"].count().unstack()
-
-    # Rename days for readability
-    heatmap_data.index = [
-        "Sunday", "Monday", "Tuesday", "Wednesday",
-        "Thursday", "Friday", "Saturday"
-    ]
-
-    fig, ax = plt.subplots(figsize=(12, 5))
-
-    # Create heatmap
-    sns.heatmap(
-        heatmap_data,
-        cmap="YlOrRd",
-        ax=ax,
-        linewidths=0.5,
-        linecolor="white",
-        cbar_kws={"label": "Number of orders"}
-    )
-
-    # Labels and title
-    ax.set_title("Order Frequency by Day and Hour", fontsize=18, fontweight="bold", pad=16)
-    ax.set_xlabel("Hour of day", fontsize=12)
-    ax.set_ylabel("Day of week", fontsize=12)
-
-    plt.tight_layout()
-    plt.show()
-
-else:
-    print("⚠️ Plot skipped: data not available in this environment.")
-```
-As shown in @fig-orders-heatmap, order activity follows a clear temporal pattern. The highest number of orders occurs on Sundays and Mondays during daytime hours, particularly between late morning and early afternoon.
-
-This confirms the patterns observed in the previous figures and shows that customer behaviour is strongly structured both daily and weekly.
+Overall, the findings indicate that customer purchasing behaviour follows a clear and recurring temporal rhythm, structured both by time of day and day of week.
 
 
 ### Co-purchase Patterns 
