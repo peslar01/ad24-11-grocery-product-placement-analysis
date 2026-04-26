@@ -1,147 +1,298 @@
 # Data Report
-All information on the data used in the project is compiled in the data report in order to ensure the traceability and reproducibility of the results and to enable a systematic expansion of the database.
 
-Typically, in the exploratory analysis of the acquired raw data, quality and other issues are identified, which require pre-processing, merging of individual datasets and feature engineering into processed datasets. Therefore, this template provides a separate section for the processed data, which then serves as a starting point for the modelling activities. This needs to be adapted to the specific project requirements.
+```{python}
+#| label: setup
+#| echo: false
+
+from pathlib import Path
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+from matplotlib.ticker import FuncFormatter
+import seaborn as sns
+
+data_dir = Path().resolve().parent / "data"
+
+orders = pd.read_csv(data_dir / "orders.csv")
+products = pd.read_csv(data_dir / "products.csv")
+aisles = pd.read_csv(data_dir / "aisles.csv")
+departments = pd.read_csv(data_dir / "departments.csv")
+order_products = pd.read_csv(data_dir / "order_products__prior.csv")
+```
+
+All information on the data used in this project is compiled in the data report to ensure traceability and reproducibility of the results.
+
+During exploratory data analysis, data quality issues and structural characteristics are identified, which may require preprocessing, merging of datasets and feature engineering. The processed data described in this report serves as the foundation for the subsequent visualisation design and implementation.
 
 ## Raw data
 ### Overview Raw Datasets
 
+### Overview Raw Datasets
+
 : Overview of raw datasets used in the project. {#tbl-raw-overview}
 
-| Name | Quelle | Storage location |
-|----------------|-----------------------------------------|--------------------------------------------------------------------------|
-| Dataset 1      | Name/short description of the data source | Link and/or short description of the location where the data is stored, e.g. accessible to the team |
-| Dataset 2      | …                                       | …                                                                        |
+| Name | Source | Storage location |
+|---|---|---|
+| orders.csv | Instacart Online Grocery Shopping Dataset 2017 | `data/orders.csv` |
+| products.csv | Instacart Online Grocery Shopping Dataset 2017 | `data/products.csv` |
+| aisles.csv | Instacart Online Grocery Shopping Dataset 2017 | `data/aisles.csv` |
+| departments.csv | Instacart Online Grocery Shopping Dataset 2017 | `data/departments.csv` |
+| order_products__prior.csv | Instacart Online Grocery Shopping Dataset 2017 | `data/order_products__prior.csv` |
 
-### Details Dataset 1
+### Details Instacart Dataset
 
-- Description of what information the dataset contains
-- Details of the data source/provider
-- Information on data procurement: description and possibly references to resources (download scripts, tools, online services, ...). Any new team member should be able to acquire the data indepentendently following these instructions.
-- Legal aspects of data use, licences, etc.
-- Data governance aspects: Categorisation of the data based on internal business requirements, e.g. public, business-relevant, personal
-- If applicable: categorisation into dependent (target variable, regressor) and independent (regressor) variables
-- ...
+The project uses the Instacart Online Grocery Shopping Dataset from 2017. The dataset contains anonymised grocery orders from online customers and includes information about orders, products, aisles, departments and previously purchased products.
+
+The dataset is used to analyse product popularity, purchasing behaviour over time, co-purchase patterns and reorder behaviour. Since the project focuses on a data visualisation product rather than a prediction model, the analysis mainly uses `order_products__prior.csv`, which contains the historical order-product relationships.
+
+The dataset is stored locally in the `data` folder of the project repository.
+
 
 #### Data Catalogue
-The data catalogue basically represents an extended schema of a relational database.
+
+: Simplified data catalogue of the main raw datasets. {#tbl-data-catalogue}
+
+| Dataset | Important columns | Short description |
+|---|---|---|
+| orders | `order_id`, `user_id`, `order_dow`, `order_hour_of_day`, `days_since_prior_order` | Contains order-level information and time-related variables. |
+| products | `product_id`, `product_name`, `aisle_id`, `department_id` | Contains product names and category references. |
+| aisles | `aisle_id`, `aisle` | Contains aisle names. |
+| departments | `department_id`, `department` | Contains department names. |
+| order_products__prior | `order_id`, `product_id`, `add_to_cart_order`, `reordered` | Contains historical product purchases per order. |
 
 
-: Data catalogue for Dataset 1. {#tbl-data-catalogue}
+#### Entity Relationship Diagram
 
-| Column index | Column name |  Datatype | Values (Range, validation rules) | Short description |
-|---|---|---|---|---|
-| 1 |   |   |   |   |
-| 2 |   |   |   |   |
-|   |   |   |   |   |
+The relationships between the datasets are straightforward and are described in the data preparation section. Therefore, no separate entity relationship diagram is included.
 
 
-#### If applicable: Entity Relationship Diagram
+#### Data Characteristics and Quality
 
+The dataset contains over 3.4 million orders from 206,209 users. It includes 49,688 products, 134 aisles and 21 departments. The purchase history contains more than 32 million product entries.
 
-#### Data Chracteristics and Quality
+The only missing values occur in `days_since_prior_order`. These missing values appear once per user and represent the first order of each customer, where no previous order exists. Therefore, they are expected and are not treated as a data quality issue.
 
-The methods of exploratory data analysis are used to describe relevant characteristics of the data and identify data quality issues. This includes, for example, 
+All other relevant tables are complete and contain no missing values. Overall, the data quality and quantity are sufficient for the planned visualisation product.
 
-the univariate andalysis of numerical variables:
+### Quantity and Time Analysis
 
-* Number or fraction
-    * of unique values
-    * of missing values
-    * of zero values
-    * of negative values
-* Frequency distribution
-* Extreme values (minimum and maximum)
-* Histogram
-* Measures of central tendency:
-    * arithmetic mean
-    * median
-    * mode
-* Measures of dispersion and visualisation of dispersion:
-    * Range
-    * Quantiles and interquartile range (IQR)
-    * Box plot
-    * Variance and standard deviation 
-
-and for categorical variables:
-
-* number of classes
-* and the corresponding distribution of values
-* fraction of missing values
-
-The correlation between variables in the form of
-
-* correlation coefficients (e.g. Pearson, Spearman, Kendall)
-* and corresponding visualizations, e.g. scatter plot, heatmap, grouped box plot (for categorical-numerical relationships), ...
-
-
-The results the exploratory data analysis should be summarised here (code and full output in the `eda` subfolder) and the implications for the subsequent data pre-processing, visualization design and implementation steps should be discussed. Is the data quality and quantity sufficient to achieve the visualisation goals? Is it necessary to acquire additional or different data? Are there any limitations that need to be considered in the design and implementation of the visualisation product? Are there any specific data characteristics that can be used to enhance the visualisation design? For example, if there are a lot of missing values in a dataset, this might need to be taken into account in the design of the visualisation product, e.g. by using specific visual encodings to indicate missing values or by providing options for filtering or imputing missing values. 
-
-Tip: `Ydata-profiling` is a Python library that can be used to perform exploratory data analysis and generate a comprehensive report on the characteristics of the data, including the distribution of values, missing values, correlations between variables, and more. This can be a useful tool to generate the full analysis in the code section and then only include the relevant information here in the data report.
-
-This is an example on how to incorporate executable Python code and show a figure output:
+Since the dataset does not contain explicit product quantities per order, quantity is interpreted as the number of orders and product occurrences over time. This section analyses when customers place orders and how purchasing activity is distributed across days and hours.
 
 ```{python}
-#| label: fig-demo
-#| fig-cap: "Distribution of monthly revenue across product categories (sample data)."
-#| echo: true
-#| code-fold: true
-import matplotlib.pyplot as plt
+#| label: fig-orders-hour
+#| fig-cap: "Number of orders by hour of day. Peak hours (9–15) are highlighted."
+#| echo: false
 
-# Sample data
-categories = ['Electronics', 'Clothing', 'Food', 'Books', 'Sports']
-revenue = [42000, 28500, 35200, 12800, 19400]
+orders_by_hour = orders.groupby("order_hour_of_day")["order_id"].count()
 
-# Create the bar chart
-fig, ax = plt.subplots(figsize=(6, 3.75))
+fig, ax = plt.subplots(figsize=(10, 5))
 
-bars = ax.bar(categories, revenue, color='#4C78A8', edgecolor='white')
+peak_color = "#2F75B5"
+offpeak_color = "#D9D9D9"
 
-ax.set_xlabel('Product Category')
-ax.set_title('Monthly Revenue by Product Category')
+colors = [
+    peak_color if 9 <= hour <= 15 else offpeak_color
+    for hour in orders_by_hour.index
+]
 
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['left'].set_visible(False)
-ax.yaxis.set_visible(False)
-ax.tick_params(axis='x', length=0)
+ax.bar(
+    orders_by_hour.index,
+    orders_by_hour.values,
+    color=colors,
+    width=0.75,
+    edgecolor="white",
+    linewidth=0.8
+)
 
-# Add value labels on bars
-for bar, val in zip(bars, revenue):
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 500,
-            f'{val:,.0f}', ha='center', va='bottom', fontsize=9)
+ax.set_title("Orders by Hour of Day", fontsize=18, fontweight="bold", pad=16)
+ax.set_xlabel("Hour of day", fontsize=12)
+ax.set_ylabel("Number of orders", fontsize=12)
+
+ax.set_xticks(range(0, 24, 1))
+ax.set_xlim(-0.8, 23.8)
+
+ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x):,}"))
+ax.yaxis.grid(True, linestyle="--", linewidth=0.8, alpha=0.45)
+ax.set_axisbelow(True)
+
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+
+legend_elements = [
+    Patch(
+        facecolor=peak_color,
+        edgecolor="white",
+        label="Peak hours (9:00–15:00)\n(highest order activity)"
+    ),
+    Patch(
+        facecolor=offpeak_color,
+        edgecolor="white",
+        label="Off-peak hours"
+    )
+]
+
+ax.legend(
+    handles=legend_elements,
+    loc="upper right",
+    frameon=True,
+    framealpha=0.95,
+    facecolor="white",
+    edgecolor="#CCCCCC"
+)
 
 plt.tight_layout()
 plt.show()
 ```
+Most orders are placed between 9:00 and 15:00, indicating a clear daily activity peak during daytime hours. Activity is very low during the night.
 
-Then the figure can be referenced with @fig-demo.
+```{python}
+#| label: fig-orders-day
+#| fig-cap: "Number of orders by day of week."
+#| echo: false
+
+#| label: fig-orders-day
+#| fig-cap: "Number of orders by day of week. Sunday and Monday show the highest order activity."
+#| echo: false
+
+# Prepare data
+orders_by_day = orders.groupby("order_dow")["order_id"].count()
+orders_by_day.index = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+fig, ax = plt.subplots(figsize=(9, 5))
+
+# Define colors
+peak_color = "#2F75B5"
+offpeak_color = "#D9D9D9"
+
+colors = [
+    peak_color if day in ["Sunday", "Monday"] else offpeak_color
+    for day in orders_by_day.index
+]
+
+# Plot
+ax.bar(
+    orders_by_day.index,
+    orders_by_day.values,
+    color=colors,
+    width=0.7,
+    edgecolor="white",
+    linewidth=0.8
+)
+
+# Labels and title
+ax.set_title("Orders by Day of Week", fontsize=18, fontweight="bold", pad=16)
+ax.set_xlabel("Day of week", fontsize=12)
+ax.set_ylabel("Number of orders", fontsize=12)
+
+# Format y-axis with comma separators
+ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x):,}"))
+
+# Gridlines
+ax.yaxis.grid(True, linestyle="--", linewidth=0.8, alpha=0.45)
+ax.set_axisbelow(True)
+
+# Clean style
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+
+# Legend
+legend_elements = [
+    Patch(
+        facecolor=peak_color,
+        edgecolor="white",
+        label="Peak days: Sunday and Monday\n(highest order activity)"
+    ),
+    Patch(
+        facecolor=offpeak_color,
+        edgecolor="white",
+        label="Other days"
+    )
+]
+
+ax.legend(
+    handles=legend_elements,
+    loc="upper right",
+    frameon=True,
+    framealpha=0.95,
+    facecolor="white",
+    edgecolor="#CCCCCC"
+)
+
+# Improve x-label readability
+plt.xticks()
+
+plt.tight_layout()
+plt.show()
+```
+Order activity is highest on Sundays and Mondays, suggesting that customers tend to plan their grocery purchases at the beginning of the week.
+```{python}
+#| label: fig-orders-heatmap
+#| fig-cap: "Order frequency by day of week and hour of day."
+#| echo: false
+
+# Prepare data for heatmap
+heatmap_data = orders.groupby(
+    ["order_dow", "order_hour_of_day"]
+)["order_id"].count().unstack()
+
+# Rename days for readability
+heatmap_data.index = [
+    "Sunday", "Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday", "Saturday"
+]
+
+fig, ax = plt.subplots(figsize=(12, 5))
+
+# Create heatmap
+sns.heatmap(
+    heatmap_data,
+    cmap="YlOrRd",
+    ax=ax,
+    linewidths=0.5,
+    linecolor="white",
+    cbar_kws={"label": "Number of orders"}
+)
+
+# Labels and title
+ax.set_title("Order Frequency by Day and Hour", fontsize=18, fontweight="bold", pad=16)
+ax.set_xlabel("Hour of day", fontsize=12)
+ax.set_ylabel("Day of week", fontsize=12)
+
+plt.tight_layout()
+plt.show()
+```
+As shown in @fig-orders-heatmap, order activity follows a clear temporal pattern. The highest number of orders occurs on Sundays and Mondays during daytime hours, particularly between late morning and early afternoon.
+
+This confirms the patterns observed in the previous figures and shows that customer behaviour is strongly structured both daily and weekly.
+
+
+### Co-purchase Patterns 
+
+[To be completed] -> Jonny
+
+### Reorder Behaviour
+
+[To be completed] -> Vep
 
 ## Processed Data
+
 ### Overview Processed Datasets
 
 : Overview of processed datasets used in the project. {#tbl-processed-overview}
 
-| Name | Quelle | Storage location |
-|----------------|-----------------------------------------|--------------------------------------------------------------------------|
-| Processed Dataset 1      | Name/short description of the data source | Link and/or short description of the location where the data is stored, e.g. accessible to the team |
-| Processed Dataset 2      | …                                       | …                                                                        |
+| Name | Source | Storage location |
+|---|---|---|
+| products_full | Merge of products, aisles and departments | Created in analysis code (EDA / Quarto) |
+| order_time_data | Merge of orders and order_products__prior | Created in analysis code (EDA / Quarto) |
 
-### Details Processed Dataset 1
+---
 
-- Description of what information the dataset contains
-- Details and reasons for the processing steps -> Traceability and ensuring reproducibility
-- How can the data be accessed? Description, scripts, tools, ...
-- ...
+### Details Processed Datasets
 
-#### Data Catalogue
+To enable meaningful analysis and visualisation, the raw datasets were combined into processed datasets.
 
+The `products_full` dataset was created by merging the products table with aisles and departments. This allows each product to be associated with human-readable category labels instead of numeric IDs.
 
-#### If applicable: Entity Relationship Diagram
+Additionally, for analysing purchasing behaviour over time, the orders dataset was combined with order_products__prior using the order_id. This enables the analysis of when specific products are purchased.
 
-
-#### Data Chracteristics and Quality
-
-
-### Details Processed Dataset 2
-...
+The processed datasets are not stored as separate files, but are generated reproducibly within the analysis code.
