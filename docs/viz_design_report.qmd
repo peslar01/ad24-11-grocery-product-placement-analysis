@@ -1,55 +1,59 @@
 # Visualization Design Report
-This report documents the visual encoding and design decisions made during the development of the visualization product. It translates the visualization concept outlined in the [Project Charta](project_charta.qmd) into concrete design specifications and documents the resulting prototype(s).
 
 ## Design Overview
-Briefly summarise the visualization concept from the Project Charta and describe any refinements or changes that emerged during the design process. Reference the project objectives and user needs that drive the design.
+
+The visualization product is designed as an interactive dashboard for users responsible for assortment planning in a grocery delivery service. The goal is to support decisions about which products should be included in the assortment and how products may be grouped or prioritised.
+
+The dashboard focuses on four main perspectives:
+1. product popularity,
+2. co-purchase relationships,
+3. reorder behaviour,
+4. temporal purchasing patterns.
+
+Compared to the initial project idea, the design is now more clearly focused on decision support rather than pure data analysis.
 
 ## Data-to-Visual Mapping
-Document the mapping of data variables to visual channels. For each view or chart in the visualization product, describe:
-
-* **Data variables**: Which variables from the processed datasets (see [Data Report](data_report.qmd)) are represented?
-* **Marks**: What geometric primitives are used to represent data items – points, lines, areas, volumes?
-* **Visual channels**: How are data attributes encoded – position, length, angle, area, colour hue, colour saturation, brightness, shape, orientation, texture?
-* **Scale and axis design**: What scales are used (linear, logarithmic, categorical, temporal)? How are axes labelled and annotated?
-* **Colour design**: What colour palette is used and why? Consider colour-blindness accessibility (e.g. using `viridis`, `ColorBrewer` palettes) and semantic colour mappings (e.g. red for negative, green for positive).
-
-A tabular overview can help provide a quick summary:
 
 : Data-to-visual mapping overview. {#tbl-encoding-overview}
 
 | View / Chart | Data variables | Mark type | Visual channels | Scale |
 |---|---|---|---|---|
-| e.g. Sales by Region | region (cat.), revenue (quant.) | bar | x-position, length, colour hue | categorical, linear |
-| ... | ... | ... | ... | ... |
+| Product popularity ranking | product name, purchase count | bar | y-position, bar length, colour highlight | categorical, linear |
+| Selected product overview | selected product, purchase count, reorder rate | text / KPI cards | text size, numeric values | categorical, linear |
+| Co-purchase products | selected product, co-purchased products, co-purchase frequency | bar | y-position, bar length, colour | categorical, linear |
+| Reorder behaviour | product name, reorder rate | bar / KPI | bar length, colour intensity | categorical, linear |
+| Orders by hour | hour of day, number of orders | bar | x-position, bar length, colour highlight | ordinal/temporal, linear |
+| Orders by day and hour | day of week, hour of day, order count | heatmap cells | x/y-position, colour intensity | categorical/temporal, linear |
 
 ## Layout and Composition
-Describe how individual views are composed into the overall visualization product:
 
-* **Spatial arrangement**: How are views arranged on the screen or page? Grid layout, free-form, scrollable narrative, etc.
-* **Coordination between views**: Are views linked (e.g. brushing and linking, shared filters, coordinated highlighting)?
-* **Hierarchy and navigation**: How does the user navigate between different levels of detail or different thematic sections?
-* **Responsive design**: How does the layout adapt to different screen sizes and devices, if applicable?
+The dashboard follows a grid-based layout. A product selector is placed at the top or in a sidebar, allowing the user to choose a product of interest. The main area contains KPI cards for the selected product, followed by visualisations for co-purchase patterns, reorder behaviour and time-based demand.
 
-Include annotated wireframes or layout sketches to illustrate the composition.
+The layout is designed to support a typical user workflow: first selecting a product, then assessing its importance, related products and temporal demand patterns.
 
 ## Interaction Design
-If the visualization product includes interactive elements, document them here:
 
-* **Interaction techniques**: Selection, filtering, zooming, panning, brushing, details-on-demand, drill-down, etc.
-* **Input modalities**: Mouse, touch, keyboard shortcuts, search fields, etc.
-* **State management**: How does the system respond to user interactions? What state transitions occur?
-* **Feedback and transitions**: How are changes communicated to the user – animations, highlighting, progressive disclosure?
+The main interaction is product selection through a dropdown or search field. After selecting a product, all related views update accordingly.
 
-For each interaction, describe which user task (from the user analysis in the Project Charta) it supports and how it contributes to the cognitive, communicative or experiential value of the product.
+Planned interactions include:
+- selecting a product,
+- filtering by department or aisle,
+- displaying details-on-demand for related products,
+- comparing selected products based on popularity and reorder behaviour.
+
+These interactions support users in exploring assortment decisions without needing to inspect raw data directly.
 
 ## Visual Style and Aesthetics
-Document the overall visual design language:
 
-* **Typography**: Font families, sizes, hierarchy of text elements (titles, labels, annotations, body text).
-* **Colour palette**: Primary and secondary colours, background, accent colours. Provide colour codes (hex/RGB).
-* **Spacing and alignment**: Grid system, margins, padding, whitespace strategy.
-* **Branding**: Integration of organisational identity, logos, visual style guides, if applicable.
-* **Accessibility**: Considerations for colour-blindness, contrast ratios, screen reader compatibility, font legibility.
+The visual style is clean and dashboard-oriented. A neutral background is used to reduce distraction, while a blue accent colour highlights important values such as peak demand periods or selected products.
+
+Planned colours:
+- Primary highlight: `#2F75B5`
+- Neutral comparison bars: `#D9D9D9`
+- Background: white
+- Text: dark grey / black
+
+Bar charts are preferred where exact comparison is important. Gridlines are used subtly to support readability without adding visual clutter.
 
 ## Prototype Description
 Document the developed prototype(s):
