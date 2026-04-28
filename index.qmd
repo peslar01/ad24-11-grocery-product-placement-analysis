@@ -1,5 +1,0 @@
----
-title: "Instacart Basket Analyse"
----
-
-Willkommen auf dem Dashboard.
