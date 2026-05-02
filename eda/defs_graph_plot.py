@@ -16,11 +16,6 @@ import pandas as pd
 from itertools import combinations
 from collections import Counter
 
-import networkx as nx
-from networkx.algorithms.community import greedy_modularity_communities
-
-import plotly.graph_objects as go
-
 
 # ---------------------------------------------------------------------------
 # Daten laden
@@ -174,7 +169,7 @@ def build_lift_graph(
     top_n: int = 300,
     min_count: int = 50,
     min_lift: float = 2.0,
-) -> nx.Graph:
+):
     """
     Baut einen gewichteten NetworkX-Graph basierend auf Lift-Werten.
 
@@ -189,6 +184,8 @@ def build_lift_graph(
     Returns:
         nx.Graph mit Edge-Attribut 'weight' (Lift) und Node-Attribut 'share'
     """
+    import networkx as nx
+
     product_counts = Counter(data["product_name"])
     total_orders = data["order_id"].nunique()
     top_products = set(ranking.head(top_n)["Produkt"])
@@ -221,7 +218,7 @@ def build_lift_graph(
 # Layout / Koordinaten
 # ---------------------------------------------------------------------------
 
-def get_coords(graph: nx.Graph, pos: dict) -> tuple:
+def get_coords(graph, pos: dict) -> tuple:
     """
     Extrahiert X/Y/Z-Koordinaten für Nodes und Edges aus einem spring_layout.
 
@@ -251,11 +248,11 @@ def get_coords(graph: nx.Graph, pos: dict) -> tuple:
 # ---------------------------------------------------------------------------
 
 def build_plot(
-    graph: nx.Graph,
+    graph,
     pos: dict,
     ranking: pd.DataFrame,
     communities: list | None = None,
-) -> go.Figure:
+):
     """
     Erstellt eine interaktive 3D-Plotly-Visualisierung des Graphen.
 
@@ -275,6 +272,8 @@ def build_plot(
         fig = build_plot(G, pos, ranking, communities=communities)
         fig.show()
     """
+    import plotly.graph_objects as go
+
     share_dict = dict(zip(ranking["Produkt"], ranking["Share in %"]))
     nodes = list(graph.nodes())
     degrees = dict(graph.degree())
@@ -338,13 +337,14 @@ def build_plot(
 # Community Detection
 # ---------------------------------------------------------------------------
 
-def detect_communities(graph: nx.Graph) -> list:
+def detect_communities(graph) -> list:
     """
     Erkennt Produktgruppen (Communities) im Graph via greedy modularity.
 
     Returns:
         Liste von frozensets mit Produktnamen
     """
+    from networkx.algorithms.community import greedy_modularity_communities
     return list(greedy_modularity_communities(graph, weight="weight"))
 
 
