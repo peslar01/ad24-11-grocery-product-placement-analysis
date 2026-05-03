@@ -63,7 +63,7 @@ def build_network_figure(top_n: int, min_count: int, min_lift: float):
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
-st.sidebar.title("🛒 Instacart EDA")
+st.sidebar.title("Instacart Product Placement Analysis")
 
 section = st.sidebar.radio(
     "Section",
@@ -464,7 +464,7 @@ elif section == "Customer Retention":
         st.title("Order Frequency by Day and Time")
         st.markdown(
             "Shows when customers are most likely to place orders throughout the week. "
-            "Brighter cells indicate higher order volumes for that day-hour combination."
+            "Darker cells indicate higher order volumes for that day-hour combination."
         )
 
         orders, products, products_full, order_products = load_csv()
