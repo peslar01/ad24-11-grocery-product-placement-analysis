@@ -1,0 +1,80 @@
+# Project Charta
+## Context and Scope
+Describe the context (domain/business area) and topic of the visualization project. Which topical aspects should be addressed? Which question(s) should the data visualization project answer? What are the expected benefits of the project? Where should the visualization product be published (e.g. website, app, intranet)?
+
+## Project Objectives and Success Criteria
+Describe the objectives **from the client/stakeholder perspective**. For example: "Enable users to understand the distribution of sales across different regions". Try to be as specific as possible, but restrict to the concrete needs formulated by the client/stakeholders. For example: if a dashboard is needed explicitly, then state it here, otherwise leave the form of the visualization product open.
+
+Formulate success criteria (from the client/stakeholder perspective): qualitative objectives and, wherever possible, corresponding quantitative metrics with target values to be achieved within the project. These objectives should directly address the pains and gains identified in the user analysis.
+
+It is also helpful to specify what is explicitly excluded from the project objectives (out of scope).
+
+## Stakeholder Analysis
+List the people involved in and affected by the project. Describe their goals and relationships with each other. Visualisation in the form of a stakeholder map can provide a quick overview.
+
+## User Analysis
+Analyse the target audience of the visualization product and create at least 2 personas with **relevant attributes** such as domain expertise, data literacy, technical environment (devices, screen sizes), frequency of use etc. Amend each persona with the dimensions of the customer profile side in the Value Proposition Canvas @Osterwalder2014:
+
+* **User tasks** (jobs): What tasks are users trying to accomplish? Consider functional jobs (e.g. analysing data, making decisions), social jobs (e.g. reporting to stakeholders, collaborating with colleagues) and emotional jobs (e.g. feeling confident in their decisions).
+* **Pains**: What obstacles, risks or undesired outcomes do users currently face? What makes their current approach frustrating or inefficient?
+* **Gains**: What outcomes and benefits do users expect or desire? What would exceed their expectations?
+
+
+## Situation Assessment
+Describe the available resources (data, personnel, material, software/tools, infrastructure, etc.) and time as well as restrictions and constraints. Possible risks that may arise during the project are also identified.
+
+
+## Visualization Concept
+Translate the project objectives into a concrete visualization concept. This corresponds to the value map side of the Value Proposition Canvas [@Osterwalder2014] – describe how the proposed visualization product addresses the users' tasks, relieves their pains and creates gains. Address the following aspects:
+
+* **Product form**: Composition of the visualization product – dashboard, data story, infographic, exploratory tool, etc.
+* **Visual encodings**: Types of charts and visualizations to be used – e.g. bar chart, line chart, scatter plot, map, etc.
+* **Interactivity**: Static vs. dynamic/interactive elements – filtering, drill-down, tooltips, linked views, etc.
+* **Narrative and annotation**: Text elements, storytelling structure, annotations and contextual information.
+* **Target medium and integration**: Embedding in the target environment – e.g. website, intranet, app, print, etc.
+
+For each design decision, articulate the intended value along three dimensions:
+
+* **Cognitive and analytical value**: How does the design amplify the user's ability to detect patterns, identify outliers, understand distributions or discover relationships [@card1999; @vanwijk2005]?
+* **Communicative value**: How does the design support the communication of information to the target audience profile(s)? 
+* **Experiential and aesthetic value**: How do the visual and interactive qualities of the design foster engagement, trust and willingness to adopt the product in practice?
+
+Justify the concept by mapping it explicitly to the project objectives and the user needs identified in the user analysis.
+
+
+## Project Plan
+Divide the project into individual phases, describe them briefly and draw up a preliminary timetable, e.g. as a Gantt chart:
+
+```{mermaid}
+%%| label: fig-project-plan
+%%| fig-cap: Preliminary project plan in the form of a Gantt chart.
+gantt
+    title Project Plan
+    dateFormat YYYY-MM-DD
+    tickInterval 5day
+    section Project Understanding
+        Initiation workshop and context analysis     :a1, 2024-07-01, 1d
+        Stakeholder and user analysis     :a3, 2024-07-02, 5d
+        Situation assessment    :a4, 2024-07-06, 1d
+        Project objectives and visualization concept    :a5, 2024-07-07, 1d
+        Sign project charta: milestone, m1, 2024-07-08, 1d
+    
+    section Data Acquisition and Exploration
+        Acquire data :a6, 2024-07-08, 3d
+        Exploratory data analysis   :a7, 2024-07-09, 2d
+        Discuss data report: milestone, m2, 2024-07-11, 1d
+        
+    section Visual Encoding and Design
+        Overview charts   :a8, 2024-07-11, 3d
+        Maps :a9, 2024-07-11, 5d
+        Implement Dashboard prototype :a10, 2024-07-16, 5d
+        Complete visualization report :a10, 2024-07-21, 1d
+    section Evaluation
+        Prepare presentation :a10, 2024-07-22, 2d
+        Project presentation : milestone, m2, 2024-07-24, 4m
+```
+
+See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html). It might not be displayed correctly in Safari &#8594; use Chrome. [Live editor with export functionality](https://mermaid.live/)
+
+## Roles and Contact Details
+List the people involved in the development work here with their role titles, tasks and contact details.
