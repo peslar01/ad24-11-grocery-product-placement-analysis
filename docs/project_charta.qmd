@@ -1,80 +1,293 @@
-# Project Charta
+# Project Charta – Group 11
+**Grocery Product Placement Analysis**
+*Course: Visualisation and Data Science Storytelling II – ZHAW, FS 2025/26*
+*Team: Lara Pestrin, Jonathan Kull, Veprim Mehmeti*
+
+---
+
 ## Context and Scope
-Describe the context (domain/business area) and topic of the visualization project. Which topical aspects should be addressed? Which question(s) should the data visualization project answer? What are the expected benefits of the project? Where should the visualization product be published (e.g. website, app, intranet)?
+
+The grocery delivery market (Quick Commerce) is highly data-driven. Platforms such as Flink or Gorillas manage assortments of thousands of products and depend on continuously optimising their offering – balancing customer demand, storage capacity, and delivery efficiency.
+
+This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, a publicly available dataset on Kaggle containing anonymised order data from a US-based grocery delivery service. The dataset covers several million orders and includes information on products, order frequency, time of purchase, and reorder behaviour.
+
+**Research questions addressed:**
+
+- Which products are purchased most frequently?
+- Which products are commonly bought together (co-purchase patterns / market basket analysis)?
+- Which products have the highest customer loyalty, as measured by reorder rate?
+- At what times of day and days of the week are orders placed most often?
+- What recommendations can be derived for product assortment, placement, and retention strategies?
+
+**Expected benefit:** The visualisation product supports assortment planners and buyers in making data-driven decisions – faster, more intuitively, and without requiring deep technical expertise.
+
+**Publication form:** Interactive web-based dashboard built with **Python Streamlit** (`app.py`), runnable locally via `streamlit run app.py`.
+
+---
 
 ## Project Objectives and Success Criteria
-Describe the objectives **from the client/stakeholder perspective**. For example: "Enable users to understand the distribution of sales across different regions". Try to be as specific as possible, but restrict to the concrete needs formulated by the client/stakeholders. For example: if a dashboard is needed explicitly, then state it here, otherwise leave the form of the visualization product open.
 
-Formulate success criteria (from the client/stakeholder perspective): qualitative objectives and, wherever possible, corresponding quantitative metrics with target values to be achieved within the project. These objectives should directly address the pains and gains identified in the user analysis.
+### Project Objectives (from the stakeholder perspective)
 
-It is also helpful to specify what is explicitly excluded from the project objectives (out of scope).
+1. **KPI Overview**: Users can access key dataset metrics (total orders, unique products, customers, reorder rate, peak shopping hour, top department) at a glance on a summary page.
+2. **Product Development – Top Sellers & Department Sales**: Users can identify the most frequently purchased products and compare sales volumes across all product departments.
+3. **Product Development – Co-Purchase Analysis**: Users can explore which products are commonly bought together, using an interactive 3D network graph filtered by lift score and pair frequency.
+4. **Customer Retention – Reorder Rate & Hidden Gems**: Users can identify the most loyal product categories, including niche products with small but highly loyal customer bases.
+5. **Customer Retention – Temporal Patterns**: Users can understand peak ordering times (day of week × hour of day) to inform promotion timing and operational planning.
+
+### Success Criteria
+
+| Criterion | Measure | Target |
+|---|---|---|
+| Comprehensibility | User can identify key insights in < 2 min (user test) | ≥ 80% of test participants |
+| Usability | Navigation and filters work without instructions | Yes (usability test) |
+| Completeness | All 5 project objectives addressed in the dashboard | 100% |
+| Data coverage | Instacart dataset fully integrated (incl. temporal data and reorder info) | Yes |
+
+### Out of Scope
+
+- Building a full analytics infrastructure or real-time data pipeline
+- Product recommendation algorithm for end customers (B2C)
+- Extension with synthetic data (weather, seasonal events, staffing)
+- Staffing / workforce planning analysis
+- Mobile-first optimisation of the dashboard
+
+---
 
 ## Stakeholder Analysis
-List the people involved in and affected by the project. Describe their goals and relationships with each other. Visualisation in the form of a stakeholder map can provide a quick overview.
+
+| Person / Group | Role | Goals / Interests |
+|---|---|---|
+| **Assortment Planner** | Primary target audience | Optimise product range, identify popular products and co-purchase patterns |
+| **Category Manager / Buyer** | Secondary target audience | Data basis for listing/delisting decisions; identify loyal and niche products |
+| **Prof. Dr. Wibke Weber** | Course supervisor (ZHAW) | Visualisation quality, communicative value |
+| **Manuel Dömer** | Course supervisor / client (ZHAW) | Correct application of the data science process, visualisation focus |
+| **Group 11** | Development team | Build the visualisation product and deliver all required documentation |
+
+---
 
 ## User Analysis
-Analyse the target audience of the visualization product and create at least 2 personas with **relevant attributes** such as domain expertise, data literacy, technical environment (devices, screen sizes), frequency of use etc. Amend each persona with the dimensions of the customer profile side in the Value Proposition Canvas @Osterwalder2014:
 
-* **User tasks** (jobs): What tasks are users trying to accomplish? Consider functional jobs (e.g. analysing data, making decisions), social jobs (e.g. reporting to stakeholders, collaborating with colleagues) and emotional jobs (e.g. feeling confident in their decisions).
-* **Pains**: What obstacles, risks or undesired outcomes do users currently face? What makes their current approach frustrating or inefficient?
-* **Gains**: What outcomes and benefits do users expect or desire? What would exceed their expectations?
+### Persona 1: Sandra, Assortment Planner
 
+**Age:** 34 | **Education:** Business Administration | **Experience:** 5 years in grocery retail
+
+**Data literacy:** Medium – works with Excel and standard reports; no programming skills.
+
+**Technical environment:** Desktop PC, Chrome browser, large monitor (27").
+
+**Frequency of use:** 2–3 times per week, primarily before planning meetings.
+
+**User Tasks (Jobs):**
+
+- *Functional:* Make assortment decisions (listing, delisting, quantities); identify top-selling and trending products
+- *Social:* Present findings in weekly planning meetings with management
+- *Emotional:* Gain confidence that decisions are data-driven and defensible
+
+**Pains:**
+
+- Reports currently require manual Excel work – time-consuming and error-prone
+- Co-purchase relationships between products are invisible in current tools
+- Fear of missing trends or delisting products that are actually performing well
+
+**Gains:**
+
+- Fast visual overview of top products without manual data preparation
+- Immediate view of "frequently bought together" products via the network graph
+- Professional, trustworthy data foundation for internal presentations
+
+---
+
+### Persona 2: Marco, Buyer
+
+**Age:** 28 | **Education:** Business / Retail Management | **Experience:** 2 years in e-commerce grocery
+
+**Data literacy:** Medium – comfortable with KPIs and simple dashboards; no programming skills.
+
+**Technical environment:** Laptop (14"), office environment, Chrome browser.
+
+**Frequency of use:** Daily during assortment reviews; ad-hoc during supplier negotiations.
+
+**User Tasks (Jobs):**
+
+- *Functional:* Evaluate new products for inclusion; identify underperforming items for removal; spot niche products with loyal customers
+- *Social:* Justify assortment decisions to category management and suppliers
+- *Emotional:* Feel confident about having the right product mix at the right time
+
+**Pains:**
+
+- No quick overview of which product combinations perform well together
+- Decisions often based on intuition rather than data
+- Niche high-loyalty products ("hidden gems") are invisible in standard sales reports
+
+**Gains:**
+
+- Instant view of co-purchase clusters and reorder loyalty per product
+- Data-driven arguments for supplier conversations
+- Discovery of hidden gems to differentiate the assortment beyond mainstream categories
+
+---
 
 ## Situation Assessment
-Describe the available resources (data, personnel, material, software/tools, infrastructure, etc.) and time as well as restrictions and constraints. Possible risks that may arise during the project are also identified.
 
+### Available Resources
+
+| Resource | Description |
+|---|---|
+| **Data** | Instacart Online Grocery Dataset (2017), sourced from [Kaggle](https://www.kaggle.com/code/tanjaadzic/instacart-dataset-2017-exploration-and-analysis). ~3.4 million orders, 206k users, 49k products. See Data Catalogue below. |
+| **Personnel** | 3 team members (Lara Pestrin, Jonathan Kull, Veprim Mehmeti) |
+| **Software** | Python (Pandas, Plotly, Streamlit, NetworkX, Seaborn, Matplotlib), GitHub, Quarto |
+| **Infrastructure** | Local development; GitHub repository for version control and submission |
+| **Supervision** | ZHAW supervisors (Weber, Dömer) with regular feedback rounds |
+
+### Data Catalogue
+
+The Instacart dataset consists of six CSV files. All data is fully anonymised; no personal information is included.
+
+| File | Rows (approx.) | Key Columns | Description |
+|---|---|---|---|
+| `orders.csv` | 3.4 million | `order_id`, `user_id`, `order_dow`, `order_hour_of_day`, `days_since_prior_order` | One row per order. Contains temporal features (day of week 0–6, hour of day 0–23) and user identifiers. No absolute dates are provided. |
+| `order_products__prior.csv` | 32 million | `order_id`, `product_id`, `add_to_cart_order`, `reordered` | All products included in prior orders. Central table for frequency, reorder rate, and co-purchase analysis. |
+| `order_products__train.csv` | 1.4 million | `order_id`, `product_id`, `add_to_cart_order`, `reordered` | Products from the most recent order per user (evaluation set, not used in main analysis). |
+| `products.csv` | 49k | `product_id`, `product_name`, `aisle_id`, `department_id` | Product master data with names and references to aisles and departments. |
+| `aisles.csv` | 134 | `aisle_id`, `aisle` | Sub-category labels, e.g. "fresh vegetables", "yogurt". |
+| `departments.csv` | 21 | `department_id`, `department` | Top-level category labels, e.g. "produce", "dairy eggs", "beverages". |
+
+In addition, three pre-computed pickle files (`data.pkl`, `ranking.pkl`, `pairs.pkl`) are used to store the results of the market basket analysis (lift scores, product pair frequencies) and are loaded at runtime to power the network graph view.
+
+**Key data characteristics and limitations:**
+
+- No absolute purchase dates available – only `order_dow` (day of week) and `order_hour_of_day`.
+- The dataset reflects US shopping behaviour from 2017 and may not fully generalise to European or current markets.
+- For the co-purchase and reorder analysis, `order_products__prior.csv` is used as the primary source, as it provides the largest and most representative sample.
+
+### Constraints and Risks
+
+| Risk | Likelihood | Mitigation |
+|---|---|---|
+| Network graph computation time | High | Results pre-computed and cached as `.pkl` files; Streamlit `@st.cache_data` used throughout |
+| Dataset too large for in-memory processing | Medium | Data aggregated before rendering; Top-N sliders limit display size |
+| No absolute dates available | Known | Visualise hour of day and day of week only; limitation documented in data report |
+| Time pressure before submission | High | Core views (KPI, Top Sellers, Heatmap) prioritised; network graph added once stable |
+
+---
 
 ## Visualization Concept
-Translate the project objectives into a concrete visualization concept. This corresponds to the value map side of the Value Proposition Canvas [@Osterwalder2014] – describe how the proposed visualization product addresses the users' tasks, relieves their pains and creates gains. Address the following aspects:
 
-* **Product form**: Composition of the visualization product – dashboard, data story, infographic, exploratory tool, etc.
-* **Visual encodings**: Types of charts and visualizations to be used – e.g. bar chart, line chart, scatter plot, map, etc.
-* **Interactivity**: Static vs. dynamic/interactive elements – filtering, drill-down, tooltips, linked views, etc.
-* **Narrative and annotation**: Text elements, storytelling structure, annotations and contextual information.
-* **Target medium and integration**: Embedding in the target environment – e.g. website, intranet, app, print, etc.
+### Product Form
 
-For each design decision, articulate the intended value along three dimensions:
+**Interactive multi-page dashboard** built with Python Streamlit – an exploratory decision-support tool for assortment planners and buyers. The dashboard is organised into **two main sections** accessible via the sidebar, each with sub-pages:
 
-* **Cognitive and analytical value**: How does the design amplify the user's ability to detect patterns, identify outliers, understand distributions or discover relationships [@card1999; @vanwijk2005]?
-* **Communicative value**: How does the design support the communication of information to the target audience profile(s)? 
-* **Experiential and aesthetic value**: How do the visual and interactive qualities of the design foster engagement, trust and willingness to adopt the product in practice?
+**Section 1 – KPI Overview** (landing page)
 
-Justify the concept by mapping it explicitly to the project objectives and the user needs identified in the user analysis.
+**Section 2 – Product Development**
+- Top Sellers
+- Department Sales
+- Products Bought Together
 
+**Section 3 – Customer Retention**
+- Reorder Rate
+- Hidden Gems
+- Shopping Time Heatmap
+
+### Visual Encodings
+
+| View | Chart type | Library | Rationale |
+|---|---|---|---|
+| KPI Overview | Metric tiles (6 KPIs) | Streamlit `st.metric` | Immediate orientation; key numbers at a glance without cognitive overhead |
+| Top Sellers | Horizontal bar chart, colour-encoded by count | Plotly Express | Clear rank comparison; colour reinforces magnitude |
+| Department Sales | Horizontal bar chart, colour-encoded by count | Plotly Express | Enables cross-category comparison at the same scale |
+| Products Bought Together | Interactive 3D network graph (nodes = products, edges = lift-weighted co-purchases, community detection for colour clusters) | Plotly + NetworkX | Reveals relational structure of the assortment; community clusters map to natural product groups |
+| Reorder Rate | Horizontal bar chart, colour-encoded by rate | Plotly Express | Rank of loyalty scores; consistent visual language with Top Sellers |
+| Hidden Gems | Horizontal bar chart, colour-encoded by rate | Plotly Express | Same encoding; filtered to non-dominant departments to surface niche products |
+| Shopping Time Heatmap | Heatmap (day of week × hour of day), YlOrRd colour scale | Seaborn / Matplotlib | Ideal for two-dimensional frequency patterns; peak times immediately visible |
+
+### Interactivity
+
+- **Sidebar navigation**: Radio buttons to switch between sections and sub-pages without page reload
+- **Sliders**:
+  - Top Sellers / Reorder Rate / Hidden Gems: control number of products displayed (5–50)
+  - Network graph: `Top-N Products` (50–500), `Minimum pair count` (10–200), `Minimum lift` (1.0–5.0)
+  - Hidden Gems: `Exclude top N departments` and `Minimum number of purchases` thresholds
+- **Tooltips**: Plotly charts provide detail-on-demand on hover (product name, count, lift)
+- **Caching**: All data loading and network computations cached via `@st.cache_data` for fast interactions
+
+### Narrative and Annotation
+
+- **KPI Overview page** provides a written summary contextualising the key metrics (e.g. habitual customer base, dominance of produce)
+- **Each sub-page** includes a one-paragraph markdown description explaining what the chart shows and how to read it
+- **`st.info` callouts** on every page highlight the most important analytical finding in plain language (e.g. "Bananas are the most purchased product…", "Most orders are placed on Sundays and Mondays between 9:00 and 15:00")
+- **Network graph** includes a detailed how-to-use guide explaining lift, cross-sell, bundling, and placement implications
+
+### Target Medium
+
+Web-based interactive dashboard built with **Python Streamlit** (`app.py`), runnable locally via:
+
+```bash
+streamlit run app.py
+```
+
+### Value Dimensions
+
+**Cognitive and analytical value:**
+The 3D network graph with community detection surfaces relational structure in the assortment that is completely invisible in tabular data – product clusters map directly to natural shopping bundles. The heatmap encodes two-dimensional frequency data (day × hour) in a format that makes peak periods immediately perceptible without any calculation [@card1999]. The consistent horizontal bar chart language across all ranking views reduces cognitive load by applying the same visual grammar throughout the dashboard.
+
+**Communicative value:**
+Each view is self-contained with a title, explanatory text, and a highlighted insight callout – users with medium data literacy can extract the key message without reading documentation. The sidebar structure mirrors the two strategic dimensions of the business (product development and customer retention), aligning the tool's architecture directly with the user's mental model [@vanwijk2005].
+
+**Experiential and aesthetic value:**
+Consistent colour scales per section (Blues for product views, YlOrRd for temporal data), clean Streamlit layout, and interactive sliders that give immediate visual feedback create a responsive, trustworthy experience. The network graph in particular provides an engaging exploratory element that goes beyond standard reporting tools and encourages discovery.
+
+---
 
 ## Project Plan
-Divide the project into individual phases, describe them briefly and draw up a preliminary timetable, e.g. as a Gantt chart:
 
 ```{mermaid}
 %%| label: fig-project-plan
-%%| fig-cap: Preliminary project plan in the form of a Gantt chart.
+%%| fig-cap: Project plan for Group 11 – Grocery Product Placement Analysis.
 gantt
-    title Project Plan
+    title Project Plan – Group 11
     dateFormat YYYY-MM-DD
-    tickInterval 5day
+    tickInterval 7day
+
     section Project Understanding
-        Initiation workshop and context analysis     :a1, 2024-07-01, 1d
-        Stakeholder and user analysis     :a3, 2024-07-02, 5d
-        Situation assessment    :a4, 2024-07-06, 1d
-        Project objectives and visualization concept    :a5, 2024-07-07, 1d
-        Sign project charta: milestone, m1, 2024-07-08, 1d
-    
-    section Data Acquisition and Exploration
-        Acquire data :a6, 2024-07-08, 3d
-        Exploratory data analysis   :a7, 2024-07-09, 2d
-        Discuss data report: milestone, m2, 2024-07-11, 1d
-        
-    section Visual Encoding and Design
-        Overview charts   :a8, 2024-07-11, 3d
-        Maps :a9, 2024-07-11, 5d
-        Implement Dashboard prototype :a10, 2024-07-16, 5d
-        Complete visualization report :a10, 2024-07-21, 1d
-    section Evaluation
-        Prepare presentation :a10, 2024-07-22, 2d
-        Project presentation : milestone, m2, 2024-07-24, 4m
+        Topic selection & dataset research         :done, a1, 2026-02-16, 7d
+        Stakeholder & user analysis                :done, a2, 2026-02-23, 7d
+        Visualisation concept                      :done, a3, 2026-03-01, 7d
+        Project Charta v1                          :done, milestone, m1, 2026-03-08, 1d
+        Supervisor feedback & Charta revision      :done, a4, 2026-03-28, 14d
+
+    section Data Acquisition & Exploration
+        Load & clean Instacart data                :done, a5, 2026-03-15, 7d
+        Exploratory data analysis (EDA)            :done, a6, 2026-03-22, 7d
+        Data report                                :active, a7, 2026-04-05, 14d
+
+    section Visualisation & Implementation
+        Top products & department sales            :done, a8, 2026-04-01, 10d
+        Co-purchase network graph                  :done, a9, 2026-04-10, 10d
+        Reorder rate & hidden gems                 :done, a10, 2026-04-15, 7d
+        Shopping time heatmap                      :done, a11, 2026-04-18, 7d
+        Dashboard integration & styling (app.py)   :done, a12, 2026-04-22, 8d
+
+    section Finalisation
+        Evaluation                                 :done, a13, 2026-04-25, 7d
+        Visualisation report                       :active, a14, 2026-04-28, 7d
+        Project Charta finalisation                :active, a15, 2026-05-01, 5d
+        README                                     :active, a16, 2026-05-03, 4d
+        Final presentation preparation             :a17, 2026-05-05, 7d
+        Final presentation                         :milestone, m2, 2026-05-12, 1d
 ```
 
-See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html). It might not be displayed correctly in Safari &#8594; use Chrome. [Live editor with export functionality](https://mermaid.live/)
+See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html). May not render correctly in Safari → use Chrome. [Live editor](https://mermaid.live/)
+
+---
 
 ## Roles and Contact Details
-List the people involved in the development work here with their role titles, tasks and contact details.
+
+| Name | Role | Tasks | Contact |
+|---|---|---|---|
+| **Lara Pestrin** | Project Lead & Documentation | Project communication, evaluation (with Jonathan), Project Charta, README | peslar01@students.zhaw.ch |
+| **Jonathan Kull** | Development & Evaluation | Dashboard implementation (`app.py`), evaluation (with Lara) | kulljon1@students.zhaw.ch |
+| **Veprim Mehmeti** | Data Analysis & Documentation | Exploratory data analysis (EDA), data report | mehmevep@students.zhaw.ch |
+| **Manuel Dömer** | Supervisor (ZHAW) | Content feedback, project sign-off | doem@zhaw.ch |
+| **Prof. Dr. Wibke Weber** | Course Director (ZHAW) | Visualisation concept, communicative quality | webw@zhaw.ch |
