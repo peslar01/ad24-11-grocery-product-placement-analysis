@@ -1,36 +1,8 @@
 # Optimising Product Placement Using Grocery Purchase Data
 
-## Project Description
+This project analyses the **Instacart Online Grocery Shopping Dataset (2017)** to understand purchasing patterns of grocery customers. The goal is to explore relationships between products that are frequently bought together and to use these insights to support product placement optimisation for grocery retail.
 
-This project analyses the **Instacart Online Grocery Shopping Dataset (2017)** to understand purchasing patterns of grocery customers.
-
-The goal of the project is to explore relationships between products that are frequently bought together and to use these insights to support store layout optimisation for a new supermarket.
-
-By analysing the dataset, we aim to answer questions such as:
-
-- Which products are most frequently purchased?
-- Which products are commonly bought together?
-- Are there typical purchasing patterns across different product categories?
-- How can these patterns be used to optimise product placement in a physical store?
-
-The final outcome of the project is a data visualisation product that communicates these insights and provides recommendations for optimal product placement and category organisation in a grocery store.
-
-## Dataset
-
-This project uses the **Instacart Online Grocery Shopping Dataset (2017)** which contains anonymised grocery orders from over 200,000 users.
-
-The dataset includes:
-
-- orders
-- products
-- product categories
-- order history of users
-- reordered products
-
-This allows the analysis of:
-- product popularity
-- purchasing behaviour
-- product associations (products bought together)
+The final outcome is an interactive web dashboard that communicates purchasing behaviour and provides data-driven recommendations for product placement and category organisation.
 
 ## Project Organisation
 The visualization product development is organised according to the following process model:
@@ -47,40 +19,11 @@ Code and configurations used in the different project phases are stored in the c
 | Evaluation | `evaluation`  | Evaluation | evaluation.qmd  |
 | Deployment | `deployment` | Deployment | deplyoment.qmd |
 
-
-The project follows the data visualisation product development process used in the course and is structured into the following phases:
-
-1. **Project Understanding**
-   - Define the project goal and research questions
-   - Understand the Instacart dataset and its structure
-
-2. **Data Acquisition and Exploration**
-   - Load and explore the Instacart dataset
-   - Perform exploratory data analysis (EDA)
-   - Identify purchasing patterns and frequently co-purchased products
-
-3. **Visual Encoding and Design**
-   - Design visualisations to communicate purchasing behaviour
-   - Explore visual representations such as:
-     - product frequency charts
-     - product association networks
-     - category-level purchasing patterns
-
-4. **Evaluation**
-   - Evaluate the clarity and effectiveness of the visualisations
-   - Improve the design based on feedback
-
-5. **Deployment**
-   - Publish the final visualisation and documentation
-
-## Documentation
+See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
 
 The full project documentation and visualisations can be accessed here:
 
-[Instacart Online Grocery Shopping Dataset](https://<your-github-username>.github.io/<repo-name>/)
-
-
-See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
+[Instacart Online Grocery Shopping Dataset](https://github.com/peslar01/ad24-11-grocery-product-placement-analysis.git)
 
 ## Python Environment Setup and Management with uv
 Make sure to have uv installed: https://docs.astral.sh/uv/getting-started/installation/
