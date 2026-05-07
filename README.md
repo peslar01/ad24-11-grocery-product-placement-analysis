@@ -9,26 +9,28 @@ The visualization product development is organised according to the following pr
 
 ![The visualization product development process](docs/pics/vizproductprocess.png)
 
-Code and configurations used in the different project phases are stored in the correspoding subfolders. Documentation artefacts in the form of a Quarto project are provided in `docs`.
+Code and configurations used in the different project phases are stored in the corresponding subfolders. Documentation artefacts in the form of a Quarto project are provided in `docs`.
 
 | Phase | Code folders | Documentation section | `docs`-File |
 |:-------|:---|:---|:---|
-| Project Understanding | -  | Project Charta | project_charta.qmd  |
-| Data Acquisition and Exploration | `eda` | Data Report | data_report.qmd  |
-| Visual Encoding and Design | `encoding-design`  | Visual Encoding and Design | viz_encoding_design.qmd  |
-| Evaluation | `evaluation`  | Evaluation | evaluation.qmd  |
-| Deployment | `deployment` | Deployment | deplyoment.qmd |
+| Project Understanding | - | Project Charta | project_charta.qmd |
+| Data Acquisition and Exploration | `data_acquisition`, `eda` | Data Report | data_report.qmd |
+| Visual Encoding and Design | - | Visual Design Report | - |
+| Evaluation | `evaluation` | Evaluation | evaluation.qmd |
+| Deployment | `deployment` | Deployment | deployment.qmd |
+
+Raw and processed data files are stored in the `data/` folder.
 
 See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
 
 The full project documentation and visualisations can be accessed here:
 
-[Instacart Online Grocery Shopping Dataset](https://github.com/peslar01/ad24-11-grocery-product-placement-analysis.git)
+[Project Repository on GitHub](https://github.com/peslar01/ad24-11-grocery-product-placement-analysis.git)
 
 ## Python Environment Setup and Management with uv
 Make sure to have uv installed: https://docs.astral.sh/uv/getting-started/installation/
 
-After cloning the repository,  create the python environment with all dependencies based on the `.python-version`, `pyproject.toml` and `uv.lock` files by running
+After cloning the repository, create the python environment with all dependencies based on the `.python-version`, `pyproject.toml` and `uv.lock` files by running
 ```bash
 uv sync
 ```
@@ -59,28 +61,15 @@ source .venv/bin/activate
 ```
 to activate the project Python environment in a terminal session in order to avoid having to prefix every command.
 
-## Runtime Configuration with Environment Variables
-The environment variables are specified in a .env-File, which is never commited into version control, as it may contain secrets. The repo just contains the file `.env.template` to demonstrate how environment variables are specified.
+## Running the Dashboard
 
-You have to create a local copy of `.env.template` in the project root folder and the easiest is to just rename it to `.env`.
+The deployment is a Streamlit web application located in `deployment/app.py`. To run it locally:
 
-The content of the .env-file is then read by the pypi-dependency: `python-dotenv`. Usage:
-```python
-import os
-from dotenv import load_dotenv
+```bash
+uv run streamlit run deployment/app.py
 ```
 
-`load_dotenv` reads the .env-file and sets the environment variables:
-
-```python
-load_dotenv()
-```
-
-which can then be accessed (assuming the file contains a line `SAMPLE_VAR=<some value>`):
-
-```python
-os.environ['SAMPLE_VAR']
-```
+Then open the URL shown in the terminal (usually `http://localhost:8501`) in your browser.
 
 ## Quarto Setup and Usage
 
@@ -108,27 +97,3 @@ uv run quarto render
 3. Preview locally: `quarto preview` from the `docs` folder
 4. Build the documentation website: `uv run quarto render` from the `docs` folder. This renders to `docs/build`
 5. Check the website locally by opening `docs/build/index.html` in a browser
-
-### Deployment of the Documentation to GitHub Pages
-
-The documentation website is deployed to GitHub Pages via a GitHub Actions workflow (`.github/workflows/publish.yml`). Every push to `main` triggers the workflow, which renders the Quarto project and deploys the result.
-
-The setting `execute: freeze: auto` in `_quarto.yml` ensures that Python computations are only executed locally. Results are cached in `docs/_freeze` and checked into the repository, so the GitHub Actions runner does not need Python — it uses the pre-computed results.
-
-#### Initial Setup (once)
-
-1. In the GitHub repository settings, go to **Settings > Pages** and set the source to **GitHub Actions**
-2. Render locally so that `_freeze` contains cached computation results:
-   ```bash
-   cd docs && uv run quarto render
-   ```
-3. Push the changes to `main`
-
-The `_freeze` directory and the workflow file `.github/workflows/publish.yml` should already be tracked in the repository.
-
-
-#### Publishing Updates
-
-1. Build the website locally: `uv run quarto render` from the `docs` folder. This updates `docs/build` (gitignored) and `docs/_freeze` (checked in)
-2. Check the website locally by opening `docs/build/index.html`
-3. Commit and push all updated files (including `docs/_freeze`) to `main`. The GitHub Actions workflow will render and deploy the site automatically
