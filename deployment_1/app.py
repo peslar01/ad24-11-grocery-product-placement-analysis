@@ -1,31 +1,52 @@
-import pickle
-import sys
+"""
+Instacart Product Placement Dashboard — deployment_1 (updated version)
+======================================================================
+
+This is a parallel copy of ../deployment/app.py.  Every page is identical
+EXCEPT  "Product Development → Products Bought Together", which has been
+rebuilt as an **aisle-level** market basket analysis.
+
+What changed and why
+--------------------
+The original co-purchase view ran on individual products. The 300-500 most
+purchased products on Instacart are almost all fresh produce, while pasta,
+snacks etc. are split across hundreds of separate SKUs — so they never form
+their own clusters.  Grouping every product into its aisle (134 aisles)
+removes that fragmentation and makes the co-purchase structure interpretable.
+
+This version also no longer needs the pre-computed .pkl files — the aisle
+analysis is light enough to compute directly from the CSVs and cache.
+
+Run it:
+    uv run streamlit run deployment_1/app.py
+"""
+
 from pathlib import Path
 
-import networkx as nx
 import pandas as pd
 import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
-sys.path.insert(0, str(Path(__file__).parent / "eda"))
-from defs_graph_plot import build_lift_graph, build_plot, detect_communities  # type: ignore
+from defs_aisle_network import (
+    compute_aisle_pairs, build_edges, giant_component,
+    detect_communities, spring_layout, build_figure, cluster_summary,
+)
 
 st.set_page_config(
-    page_title="Instacart EDA",
+    page_title="Instacart EDA — aisle-level",
     page_icon="🛒",
     layout="wide",
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = PROJECT_ROOT / "data"
+# data lives at the project root: PODSV_Project/data
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 CSV_FILES = [
     "orders.csv", "products.csv", "aisles.csv",
     "departments.csv", "order_products__prior.csv",
 ]
-PKL_FILES = ["data.pkl", "ranking.pkl", "pairs.pkl"]
 
 
 @st.cache_data(show_spinner="Loading data …")
@@ -39,32 +60,30 @@ def load_csv():
     return orders, products, products_full, order_products
 
 
-@st.cache_data(show_spinner="Loading network data …")
-def load_pkl():
-    with open(DATA_DIR / "data.pkl", "rb") as f:
-        data = pickle.load(f)
-    with open(DATA_DIR / "ranking.pkl", "rb") as f:
-        ranking = pickle.load(f)
-    with open(DATA_DIR / "pairs.pkl", "rb") as f:
-        pairs = pickle.load(f)
-    return data, ranking, pairs
+# ── Aisle-level market basket analysis (cached) ───────────────────────────────
+@st.cache_data(show_spinner="Counting aisle co-purchases — one-time, ~30–60 s …")
+def load_aisle_pairs():
+    """Heavy step: count how often each pair of aisles is bought together."""
+    return compute_aisle_pairs(str(DATA_DIR))
 
 
-@st.cache_data(show_spinner="Building network graph (this may take a moment) …")
-def build_network_figure(top_n: int, min_count: int, min_lift: float):
-    data, ranking, pairs = load_pkl()
-    G = build_lift_graph(
-        pairs, data, ranking,
-        top_n=top_n, min_count=min_count, min_lift=min_lift,
-    )
-    pos = nx.spring_layout(G, dim=3, k=0.6, iterations=200, seed=42)
-    communities = detect_communities(G)
-    fig = build_plot(G, pos, ranking, communities=communities)
-    return fig, G.number_of_nodes(), G.number_of_edges()
+@st.cache_data(show_spinner="Building the aisle network …")
+def build_aisle_network(min_count: int, min_lift: float):
+    pairs, count_a, n_orders, aid2name = load_aisle_pairs()
+    edges = build_edges(pairs, count_a, n_orders, aid2name,
+                        min_count=min_count, min_lift=min_lift)
+    giant, edges = giant_component(edges)
+    nodes = sorted(giant)
+    node_comm = detect_communities(nodes, edges)
+    pos = spring_layout(nodes, edges, node_comm)
+    fig = build_figure(nodes, edges, node_comm, pos, count_a, aid2name)
+    summary = cluster_summary(nodes, node_comm, count_a, aid2name)
+    return fig, summary, len(nodes), len(edges)
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 st.sidebar.title("Instacart Product Placement Analysis")
+st.sidebar.caption("deployment_1 · aisle-level co-purchase update")
 
 section = st.sidebar.radio(
     "Section",
@@ -86,13 +105,11 @@ elif section == "Customer Retention":
         ["Reorder Rate", "Hidden Gems", "Shopping Time Heatmap"],
     )
 
-# ── Guard: missing CSV files ───────────────────────────────────────────────
+# ── Guard: missing CSV files ──────────────────────────────────────────────────
 missing_csv = [f for f in CSV_FILES if not (DATA_DIR / f).exists()]
-network_active = (section == "Product Development" and sub_page == "Products Bought Together")
-
-if missing_csv and not network_active:
+if missing_csv:
     st.error(
-        f"Missing CSV files in `data/`: {', '.join(missing_csv)}\n\n"
+        f"Missing CSV files in `{DATA_DIR}`: {', '.join(missing_csv)}\n\n"
         "Please run the **data_acquisition** notebook first."
     )
     st.stop()
@@ -108,6 +125,10 @@ if section == "KPI Overview":
         covering over 3 million grocery orders placed by more than 200,000 customers.
         Use the sidebar to navigate between the **Product Development** and
         **Customer Retention** analysis sections.
+
+        > **deployment_1 note —** this is the updated build: the
+        *Products Bought Together* page now runs an **aisle-level** market
+        basket analysis instead of a product-level one.
         """
     )
 
@@ -175,7 +196,7 @@ elif section == "Product Development":
             orientation="h",
             labels={"count": "Number of Purchases", "product_name": ""},
             color="count",
-            color_continuous_scale="Blues",
+            color_continuous_scale="Greens",
         )
         fig.update_layout(coloraxis_showscale=False, height=max(400, n * 22))
         st.plotly_chart(fig, width='stretch')
@@ -222,106 +243,98 @@ elif section == "Product Development":
         )
 
     elif sub_page == "Products Bought Together":
-        st.title("Products Bought Together (Market Basket Analysis)")
+        st.title("Products Bought Together — Aisle-Level Market Basket Analysis")
+
         st.markdown(
-            "Visualizes which products are frequently purchased in the same order. "
-            "Nodes represent products, edges indicate strong co-purchase associations (lift). "
-            "Color-coded clusters reveal natural product groups."
+            """
+            **What changed in this version.** The original analysis ran on
+            individual products. But the 300–500 most-purchased products are
+            almost all fresh produce, while categories like *pasta* or *snacks*
+            are split across hundreds of separate SKUs — so they could never
+            form their own clusters.
+
+            This page groups every product into its **aisle** (134 aisles).
+            Each pasta SKU collapses into one strong *dry pasta* node, each
+            chip SKU into *chips pretzels*, and the co-purchase structure
+            finally becomes interpretable.
+            """
         )
 
-        missing_pkl = [f for f in PKL_FILES if not (DATA_DIR / f).exists()]
-        if missing_pkl:
-            st.error(
-                f"Missing files in `data/`: {', '.join(missing_pkl)}\n\n"
-                "Please run the **graph_plot** notebook first."
-            )
-            st.stop()
-
         st.markdown(
-            "Nodes = Products · Edges = frequently bought together · "
-            "Node size = purchase frequency · Color = Community"
+            "Nodes = aisles · Edges = aisles frequently bought together · "
+            "Node size = how many orders contain that aisle · Colour = cluster"
         )
 
         with st.expander("How to read this chart — Guide"):
             st.markdown(
                 """
-### What is Market Basket Analysis?
+### What is this?
 
-Market Basket Analysis finds products that customers tend to buy **in the same order**.
-It answers: *"If a customer buys product A, how likely are they to also buy product B?"*
-
----
-
-### Reading the Graph
-
-| Element | What it means |
-|---|---|
-| **Node (sphere)** | A single product |
-| **Node size** | How often that product is purchased overall — bigger = more popular |
-| **Node colour** | The community (cluster) the product belongs to |
-| **Edge (line)** | The two products are frequently bought together |
-| **Edge thickness** | Strength of the association (lift value) |
-
----
-
-### The Key Metric: Lift
-
-**Lift** measures how much more often two products are bought together compared to what you'd expect by chance.
+For every pair of aisles, we count how many orders contain **both**, then
+compute the **lift** — how much more often they are bought together than
+random chance would predict.
 
 | Lift value | Meaning |
 |---|---|
-| **= 1.0** | No association — products are bought together by coincidence only |
-| **> 1.0** | Positive association — customers buy them together more than expected |
-| **> 2.0** | Strong association — a good cross-sell candidate |
-| **> 3.0** | Very strong — nearly always purchased together |
+| **= 1.0** | No association — co-occurrence is pure coincidence |
+| **> 1.0** | Positive association — bought together more than expected |
+| **> 1.5** | Strong association — a reliable co-purchase pattern |
 
-> Example: Lift of 3.0 for *Limes + Avocado* means customers buy them together **3× more often** than chance would predict.
+Aisles connected by these lift edges are then grouped into **clusters**
+(communities) using weighted greedy-modularity detection. Each cluster is a
+natural "shopping basket".
 
----
+### Sidebar parameters
 
-### Sidebar Parameters
+**Minimum co-occurrence count** — how many orders two aisles must share
+before an edge is drawn. Filters out rare, accidental pairings.
 
-**Top-N Products** — how many of the most popular products to include in the graph.
-A higher number shows more connections but makes the graph slower and harder to read.
-Start with 150–300 for a clear overview.
-
-**Minimum pair count** — how many times two products must have been bought together to draw an edge.
-Raise this to filter out weak or accidental associations and focus on reliable patterns.
-
-**Minimum lift** — the lowest lift value required to draw an edge.
-Values below 1.5 produce a very dense graph; values above 3.0 show only the strongest links.
-
----
+**Minimum lift** — the lowest lift required to draw an edge. Higher values
+keep only the strongest associations.
 
 ### How to use the results
 
-- **Cross-sell**: Products connected by a strong edge are good candidates to recommend together ("Customers also bought…")
-- **Bundling**: A tight cluster of products can be packaged as a promotional bundle
-- **App placement**: Products in the same community should be grouped together in the same app category or shown in the same search results
-- **Promotions**: Discounting one product in a pair with high lift will likely increase sales of its partner
+- **Cross-sell**: recommend aisles within the same cluster
+- **Bundling**: promote products from tightly linked aisles together
+- **Layout**: place cluster members in the same app section / shelf zone
                 """
             )
 
         with st.sidebar:
             st.divider()
             st.subheader("Parameters")
-            top_n     = st.slider("Top-N Products",     50,  500, 300, step=50)
-            min_count = st.slider("Minimum pair count", 10,  200,  50, step=10)
-            min_lift  = st.slider("Minimum lift",       1.0, 5.0,  2.0, step=0.5)
+            min_count = st.slider("Minimum co-occurrence count",
+                                  500, 20000, 2000, step=500)
+            min_lift  = st.slider("Minimum lift", 1.0, 3.0, 1.3, step=0.1)
 
-        fig, n_nodes, n_edges = build_network_figure(top_n, min_count, min_lift)
+        fig, summary, n_nodes, n_edges = build_aisle_network(min_count, min_lift)
 
-        col1, col2 = st.columns(2)
-        col1.metric("Nodes (Products)", n_nodes)
-        col2.metric("Edges (Connections)", n_edges)
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Aisles (nodes)", n_nodes)
+        col2.metric("Co-purchase links", n_edges)
+        col3.metric("Clusters found", len(summary))
 
-        st.plotly_chart(fig, width='stretch', height=700)
+        st.plotly_chart(fig, width='stretch')
+
+        st.subheader("The clusters")
+        for c in summary:
+            st.markdown(
+                f"<span style='display:inline-block;width:12px;height:12px;"
+                f"border-radius:50%;background:{c['colour']};margin-right:8px'></span>"
+                f"**Cluster {c['cluster']}** · {c['size']} aisles",
+                unsafe_allow_html=True,
+            )
+            st.caption(", ".join(c["aisles"]))
 
         st.info(
-            "Products are connected when they are frequently purchased together "
-            "and their lift exceeds the minimum threshold. "
-            "Clusters reveal natural product groups — useful for cross-sell recommendations, "
-            "bundle promotions, and optimising store shelf placement."
+            "Grouped by aisle, baskets split by **shopping mission**: a large "
+            "*cooking basket* (fresh produce, dairy, meat — plus pasta, sauce, "
+            "oils and spices), a *convenience & household run* (snacks, drinks, "
+            "frozen meals, cleaning and personal care), a remarkably tight "
+            "*drinks run* (beer, wine, spirits), and a small *health & bulk* "
+            "basket. Note that pasta does **not** form its own cluster — it "
+            "groups with the ingredients it is cooked with — and snacks group "
+            "with the convenience run, not with pasta."
         )
 
 
@@ -363,7 +376,7 @@ elif section == "Customer Retention":
             orientation="h",
             labels={"reorder_rate": "Reorder Rate", "product_name": ""},
             color="reorder_rate",
-            color_continuous_scale="Blues",
+            color_continuous_scale="Greens",
             range_x=[0, 1],
         )
         fig.update_layout(coloraxis_showscale=False, height=max(400, n * 22))
@@ -389,7 +402,6 @@ elif section == "Customer Retention":
         min_purchases = st.slider("Minimum number of purchases", 100, 2000, 500, step=100)
         n_products    = st.slider("Number of products to show", 5, 40, 20)
 
-        # Identify top-N departments by total purchase volume
         dept_sales = (
             order_products
             .merge(products_full[["product_id", "department_id"]], on="product_id")
@@ -400,7 +412,6 @@ elif section == "Customer Retention":
         )
         top_dept_ids = set(dept_sales.head(top_n_depts)["department_id"])
 
-        # Products NOT in the top departments
         nontop_product_ids = set(
             products_full.loc[
                 ~products_full["department_id"].isin(top_dept_ids), "product_id"
@@ -445,7 +456,7 @@ elif section == "Customer Retention":
                 orientation="h",
                 labels={"reorder_rate": "Reorder Rate", "product_name": ""},
                 color="reorder_rate",
-                color_continuous_scale="Blues",
+                color_continuous_scale="Greens",
                 range_x=[0, 1],
             )
             fig.update_layout(
@@ -481,7 +492,7 @@ elif section == "Customer Retention":
         fig, ax = plt.subplots(figsize=(12, 4))
         sns.heatmap(
             heatmap_data,
-            cmap="YlOrRd",
+            cmap="YlGn",
             ax=ax,
             linewidths=0.4,
             linecolor="white",
