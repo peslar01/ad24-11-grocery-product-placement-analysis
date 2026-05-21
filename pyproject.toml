@@ -16,6 +16,5 @@ dependencies = [
     "pyarrow>=16.0",
     "python-dotenv>=1.1.1",
     "seaborn>=0.13.2",
-    "ydata-profiling>=4.12.2",
     "streamlit>=1.40.0",
 ]

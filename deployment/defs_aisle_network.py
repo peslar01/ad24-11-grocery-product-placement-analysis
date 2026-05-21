@@ -2,8 +2,7 @@
 defs_aisle_network.py — Aisle-level market basket analysis
 ==========================================================
 
-This module replaces the original *product-level* co-purchase analysis
-(see ../eda/defs_graph_plot.py) with an *aisle-level* one.
+This module performs *aisle-level* co-purchase / market basket analysis.
 
 Why aisle level?
     The top products on Instacart are overwhelmingly fresh produce, while
