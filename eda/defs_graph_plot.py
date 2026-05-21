@@ -12,6 +12,8 @@ Verwendung in Quarto (.qmd) aus einem anderen Ordner:
     from defs import load_data, build_ranking, ...
 """
 
+from pathlib import Path
+
 import pandas as pd
 from itertools import combinations
 from collections import Counter
@@ -367,25 +369,51 @@ def save_processed(
     pairs: Counter,
     out_dir: str = "../data",
 ) -> None:
-    import pickle, os
-    os.makedirs(out_dir, exist_ok=True)
-    with open(f"{out_dir}/data.pkl", "wb") as f:
-        pickle.dump(data, f)
-    with open(f"{out_dir}/ranking.pkl", "wb") as f:
-        pickle.dump(ranking, f)
-    with open(f"{out_dir}/pairs.pkl", "wb") as f:
-        pickle.dump(pairs, f)
-    print(f"Gespeichert in {out_dir}/")
+    """Persist the processed data layer as Parquet files.
+
+    Parquet is used instead of pickle: it is a stable, language-independent
+    columnar format, compresses far better, and carries no code-execution
+    risk on load. The ``pairs`` Counter is stored as a three-column table
+    (product_a, product_b, count).
+    """
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    data.to_parquet(out / "data.parquet", index=False)
+    ranking.to_parquet(out / "ranking.parquet", index=False)
+
+    pairs_df = pd.DataFrame(
+        [(a, b, count) for (a, b), count in pairs.items()],
+        columns=["product_a", "product_b", "count"],
+    )
+    pairs_df.to_parquet(out / "pairs.parquet", index=False)
+
+    print(f"Saved processed data (Parquet) to {out}/")
 
 
 def load_processed(
     out_dir: str = "../data",
 ) -> tuple:
-    import pickle
-    with open(f"{out_dir}/data.pkl", "rb") as f:
-        data = pickle.load(f)
-    with open(f"{out_dir}/ranking.pkl", "rb") as f:
-        ranking = pickle.load(f)
-    with open(f"{out_dir}/pairs.pkl", "rb") as f:
-        pairs = pickle.load(f)
+    """Load the processed data layer written by :func:`save_processed`.
+
+    Returns
+    -------
+    (data, ranking, pairs)
+        ``data`` and ``ranking`` are DataFrames; ``pairs`` is reconstructed as
+        a Counter keyed by (product_a, product_b) so the downstream rule and
+        graph functions keep working unchanged.
+    """
+    out = Path(out_dir)
+
+    data = pd.read_parquet(out / "data.parquet")
+    ranking = pd.read_parquet(out / "ranking.parquet")
+
+    pairs_df = pd.read_parquet(out / "pairs.parquet")
+    pairs = Counter(
+        dict(zip(
+            zip(pairs_df["product_a"], pairs_df["product_b"]),
+            pairs_df["count"],
+        ))
+    )
+
     return data, ranking, pairs

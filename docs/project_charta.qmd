@@ -153,7 +153,7 @@ The Instacart dataset consists of six CSV files. All data is fully anonymised; n
 | `aisles.csv` | 134 | `aisle_id`, `aisle` | Sub-category labels, e.g. "fresh vegetables", "yogurt". |
 | `departments.csv` | 21 | `department_id`, `department` | Top-level category labels, e.g. "produce", "dairy eggs", "beverages". |
 
-In addition, three pre-computed pickle files (`data.pkl`, `ranking.pkl`, `pairs.pkl`) are used to store the results of the market basket analysis (lift scores, product pair frequencies) and are loaded at runtime to power the network graph view.
+In addition, three pre-computed Parquet files (`data.parquet`, `ranking.parquet`, `pairs.parquet`) are used to store the results of the market basket analysis (lift scores, product pair frequencies) and are loaded at runtime to power the network graph view.
 
 **Key data characteristics and limitations:**
 
@@ -165,7 +165,7 @@ In addition, three pre-computed pickle files (`data.pkl`, `ranking.pkl`, `pairs.
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| Network graph computation time | High | Results pre-computed and cached as `.pkl` files; Streamlit `@st.cache_data` used throughout |
+| Network graph computation time | High | Results pre-computed and cached as `.parquet` files; Streamlit `@st.cache_data` used throughout |
 | Dataset too large for in-memory processing | Medium | Data aggregated before rendering; Top-N sliders limit display size |
 | No absolute dates available | Known | Visualise hour of day and day of week only; limitation documented in data report |
 | Time pressure before submission | High | Core views (KPI, Top Sellers, Heatmap) prioritised; network graph added once stable |
