@@ -16,9 +16,7 @@ website:
       - index.qmd
       - project_charta.qmd
       - data_report.qmd
-      - viz_design_report.qmd
-      - evaluation.qmd
-      - meeting_notes.qmd
+
 
 format:
   html:
