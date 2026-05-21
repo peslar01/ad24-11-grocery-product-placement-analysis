@@ -7,7 +7,7 @@ language:
   section-title-appendices: "Appendix"
 
 website:
-  title: "Sample Project"
+  title: "Grocery Product Placement Analysis"
   search: true
   sidebar:
     style: "floating"
