@@ -4,6 +4,8 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)** t
 
 The final outcome is an interactive web dashboard that communicates purchasing behaviour and provides data-driven recommendations for product placement and category organisation.
 
+**Key findings:** Across 3.4 million orders from ~206,000 customers, Produce and Dairy & Eggs emerge as the strongest co-purchased department pair (~1.8 million shared orders), pointing directly to adjacency opportunities on the shop floor. The overall reorder rate sits at 58%, with everyday staples such as bananas, milk, and water exceeding 80% — a clear signal for loyalty-driven assortment decisions. Order activity peaks on Sundays and Mondays between 09:00 and 15:00, with very little traffic outside 06:00–22:00.
+
 ## Project Organisation
 The visualization product development is organised according to the following process model:
 
@@ -15,17 +17,17 @@ Code and configurations used in the different project phases are stored in the c
 |:-------|:---|:---|:---|
 | Project Understanding | - | Project Charta | project_charta.qmd |
 | Data Acquisition and Exploration | `data_acquisition`, `eda` | Data Report | data_report.qmd |
-| Visual Encoding and Design | - | Visual Design Report | - |
-| Evaluation | `evaluation` | Evaluation | evaluation.qmd |
-| Deployment | `deployment` | Deployment | deployment.qmd |
+| Visual Encoding and Design | - | Visual Design Report | - (not submitted) |
+| Evaluation | `evaluation` | Evaluation | - (not submitted) |
+| Deployment | `deployment` | Deployment | - (not submitted) |
 
 Raw and processed data files are stored in the `data/` folder.
 
 See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
 
-The full project documentation and visualisations can be accessed here:
+The rendered documentation website (Project Charta, Data Report, and Dashboard) is hosted on GitHub Pages and can be accessed here:
 
-[Project Repository on GitHub](https://github.com/peslar01/ad24-11-grocery-product-placement-analysis.git)
+[Project Repository and Documentation on GitHub](https://github.com/peslar01/ad24-11-grocery-product-placement-analysis.git)
 
 ## Python Environment Setup and Management with uv
 Make sure to have uv installed: https://docs.astral.sh/uv/getting-started/installation/
