@@ -68,6 +68,8 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 
 ## User Analysis
 
+The two personas below are structured around the Jobs-to-be-Done framework [@Osterwalder2014], capturing functional, social, and emotional tasks alongside the pains users experience and the gains they seek.
+
 ### Persona 1: Sandra, Assortment Planner
 
 **Age:** 34 | **Education:** Business Administration | **Experience:** 5 years in grocery retail
@@ -191,6 +193,8 @@ In addition, the aisle-level co-purchase / market basket analysis (co-occurrence
 - Shopping Time Heatmap
 
 ### Visual Encodings
+
+Visual channels are assigned to data attributes following the principles of expressiveness and effectiveness [@munzner2014]: position encodes rank, colour encodes magnitude or rate, and interaction is reserved for filtering rather than for core communication tasks.
 
 | View | Chart type | Library | Rationale |
 |---|---|---|---|

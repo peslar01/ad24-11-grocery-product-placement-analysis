@@ -23,7 +23,7 @@ product placement and category organisation.
 ![The visualisation product development process](pics/vizproductprocess.png){#fig-vizprocess}
 
 The methodological procedure follows the process model shown in
-@fig-vizprocess. This documentation focuses on the two required components and
+@fig-vizprocess [@DoemerKempf2022]. This documentation focuses on the two required components and
 comprises the following sections:
 
 - **[Project Charta](project_charta.qmd)** — context and scope, stakeholder and

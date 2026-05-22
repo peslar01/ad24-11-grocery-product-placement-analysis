@@ -1,7 +1,7 @@
 [project]
-name = "sample-project"
+name = "grocery-product-placement-analysis"
 version = "0.1.0"
-description = "Add your description here"
+description = "Interactive dashboard for grocery purchase pattern analysis — ZHAW PODSV FS26, Group 11"
 readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [

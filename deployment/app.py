@@ -1,12 +1,10 @@
 """
-Instacart Product Placement Dashboard — deployment_1 (modular version)
-======================================================================
+Instacart Product Placement Dashboard
+======================================
 
-This is a parallel copy of ../deployment/app.py.  Every page is identical
-EXCEPT  "Product Development → Products Bought Together", which has been
-rebuilt as an **aisle-level** market basket analysis, and the Customer
-Retention pages, which have been upgraded for visual consistency and
-analytical depth.
+Interactive multi-page dashboard for grocery purchase pattern analysis,
+built with Python Streamlit as part of the PODSV course project (ZHAW FS26,
+Group 11).
 
 Architecture
 ------------
@@ -16,16 +14,8 @@ Architecture
 - views/                     : one module per dashboard page; each exposes
                                a single `render()` function
 
-Why this split?
-- *Separation of Concerns*: data loading, network maths, and per-page UI
-  each live in their own file.  Each file is now short enough to read in
-  one sitting.
-- *DRY (Don't Repeat Yourself)*: the per-product aggregation that used to
-  appear in three places now lives once in `data_loaders.product_stats()`
-  and is imported wherever it's needed.
-
 Run it:
-    uv run streamlit run deployment_1/app.py
+    uv run streamlit run deployment/app.py
 """
 
 import streamlit as st
@@ -42,14 +32,14 @@ from views import (
 )
 
 st.set_page_config(
-    page_title="Instacart EDA — aisle-level",
+    page_title="Grocery Product Placement Analysis",
     page_icon="🛒",
     layout="wide",
 )
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
-st.sidebar.title("Instacart Product Placement Analysis")
-st.sidebar.caption("deployment_1 · aisle-level co-purchase update")
+st.sidebar.title("Grocery Product Placement Analysis")
+st.sidebar.caption("Instacart Dataset 2017 · Group 11, ZHAW FS26")
 
 section = st.sidebar.radio(
     "Section",

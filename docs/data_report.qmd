@@ -290,11 +290,302 @@ The heavy counting step (`compute_aisle_pairs`) runs once and is cached by Strea
 
 ## Exploratory Analysis
 
-The exploratory analysis is implemented in `eda/eda.ipynb`. The key findings are summarised in the data characteristics section above. The figure below reproduces the most informative view: the shopping time pattern, which is also the only temporal pattern the dataset allows.
+The full analysis is documented in `eda/eda.ipynb`. Rather than listing findings as bullet points, this section asks the four questions that drove the dashboard's design and shows the data behind each answer. The goal is to make the path from raw numbers to business decision visible — what was found, why it matters, and how it is reflected in the final product.
 
-### Order frequency heatmap
+### What sells?
 
-The following figure reproduces the shopping time analysis from `eda/eda.ipynb` and `deployment/app.py`.
+The most direct question for any assortment planner is which products actually move. @fig-top-products shows the 20 most-purchased products across 32 million purchase events in `order_products__prior.csv`.
+
+```{python}
+#| label: fig-top-products
+#| fig-cap: "Top 20 products by purchase volume."
+#| echo: true
+#| code-fold: true
+from pathlib import Path
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import seaborn as sns
+import pandas as pd
+
+data_dir = Path().resolve().parent / "data"
+products = pd.read_csv(data_dir / "products.csv")
+order_products = pd.read_csv(data_dir / "order_products__prior.csv",
+                             usecols=["product_id"])
+
+top_products = (
+    order_products.groupby("product_id")["product_id"]
+    .count()
+    .reset_index(name="count")
+    .merge(products[["product_id", "product_name"]], on="product_id")
+    .sort_values("count", ascending=False)
+    .head(20)
+)
+
+BAR_COLOR = "#FB6A4A"
+sns.set_theme(style="whitegrid")
+plt.rcParams["axes.titleweight"] = "bold"
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(data=top_products, x="count", y="product_name", color=BAR_COLOR, ax=ax)
+ax.set_xlabel("Number of purchases")
+ax.set_ylabel("")
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(
+    lambda v, _: f"{v/1e6:.1f}M" if v >= 1e6 else f"{v:,.0f}"))
+ax.bar_label(ax.containers[0], fmt="{:,.0f}", padding=3, fontsize=8)
+sns.despine(left=True, bottom=True)
+plt.tight_layout()
+plt.show()
+```
+
+Bananas are the single most-purchased product by a wide margin. Thirteen of the top 20 carry an organic label, pointing to a platform-wide preference for fresh and organic produce that goes beyond individual product popularity. This skew shapes the department picture as well: @fig-dept-sales shows that Produce alone accounts for nearly nine million purchases — almost twice as many as the next largest department, Dairy & Eggs.
+
+```{python}
+#| label: fig-dept-sales
+#| fig-cap: "Total purchases by department."
+#| echo: true
+#| code-fold: true
+from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+data_dir = Path().resolve().parent / "data"
+products = pd.read_csv(data_dir / "products.csv")
+aisles = pd.read_csv(data_dir / "aisles.csv")
+departments = pd.read_csv(data_dir / "departments.csv")
+order_products = pd.read_csv(data_dir / "order_products__prior.csv",
+                             usecols=["product_id"])
+
+products_full = (products
+    .merge(aisles, on="aisle_id")
+    .merge(departments, on="department_id"))
+
+dept_counts = (
+    order_products
+    .merge(products_full[["product_id", "department"]], on="product_id")
+    .groupby("department")["product_id"]
+    .count()
+    .reset_index(name="count")
+    .sort_values("count", ascending=False)
+)
+dept_counts["count_M"] = dept_counts["count"] / 1_000_000
+
+BAR_COLOR = "#FB6A4A"
+sns.set_theme(style="whitegrid")
+plt.rcParams["axes.titleweight"] = "bold"
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(data=dept_counts, x="count_M", y="department", color=BAR_COLOR, ax=ax)
+ax.set_xlabel("Number of purchases (millions)")
+ax.set_ylabel("")
+ax.bar_label(ax.containers[0], fmt="%.1fM", padding=3, fontsize=8)
+sns.despine(left=True, bottom=True)
+plt.tight_layout()
+plt.show()
+```
+
+Produce and Dairy & Eggs are the two anchor departments. Snacks and Beverages follow at a considerable distance; departments like Bulk, Other, and Alcohol rarely appear in orders on this platform.
+
+**For assortment planners:** These two charts form the non-negotiable baseline. Produce and Dairy & Eggs are not just popular — they are the reason customers open the app. Any assortment change that touches either carries outsized risk. The **Top Sellers** and **Department Sales** views in the dashboard present exactly this data in an interactive format that can be filtered and explored before planning meetings.
+
+### Who keeps coming back?
+
+Purchase frequency tells us what sells; reorder rate tells us who stays. @fig-reorder-rate ranks the products with the highest reorder rates among items purchased at least 500 times — the minimum to make the rate statistically meaningful.
+
+```{python}
+#| label: fig-reorder-rate
+#| fig-cap: "Top 20 products by reorder rate (minimum 500 purchases). The dashed line marks 80%."
+#| echo: true
+#| code-fold: true
+from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+data_dir = Path().resolve().parent / "data"
+products = pd.read_csv(data_dir / "products.csv")
+order_products = pd.read_csv(data_dir / "order_products__prior.csv",
+                             usecols=["product_id", "reordered"])
+
+product_counts = order_products.groupby("product_id")["product_id"].count()
+popular = product_counts[product_counts >= 500].index
+
+reorder = (
+    order_products[order_products["product_id"].isin(popular)]
+    .groupby("product_id")["reordered"]
+    .mean()
+    .reset_index()
+    .rename(columns={"reordered": "reorder_rate"})
+    .merge(products[["product_id", "product_name"]], on="product_id")
+    .sort_values("reorder_rate", ascending=False)
+    .head(20)
+)
+
+BAR_COLOR = "#FB6A4A"
+sns.set_theme(style="whitegrid")
+plt.rcParams["axes.titleweight"] = "bold"
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(data=reorder, x="reorder_rate", y="product_name", color=BAR_COLOR, ax=ax)
+ax.set_xlabel("Reorder rate")
+ax.set_ylabel("")
+ax.set_xlim(0, 1)
+ax.axvline(0.8, color="#888888", linestyle="--", linewidth=1)
+ax.bar_label(ax.containers[0], fmt="%.2f", padding=3, fontsize=8)
+sns.despine(left=True, bottom=True)
+plt.tight_layout()
+plt.show()
+```
+
+Every product in the top 20 exceeds 80% reorder rate: customers who buy them once buy them again, predictably. The list is dominated by everyday staples — milk, water, bananas — where purchasing is habitual rather than exploratory. This is the platform's loyalty core.
+
+Strong reorder rates are not, however, exclusive to bestsellers. @fig-hidden-gems plots reorder rate against purchase volume for every product with at least 100 purchases, separating the five highest-volume departments from the rest of the assortment.
+
+```{python}
+#| label: fig-hidden-gems
+#| fig-cap: "Reorder rate versus purchase volume per product (log scale). Products outside the five highest-volume departments are highlighted. The dashed line marks the overall platform reorder rate (~58%)."
+#| echo: true
+#| code-fold: true
+from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+data_dir = Path().resolve().parent / "data"
+products = pd.read_csv(data_dir / "products.csv")
+aisles = pd.read_csv(data_dir / "aisles.csv")
+departments = pd.read_csv(data_dir / "departments.csv")
+order_products = pd.read_csv(data_dir / "order_products__prior.csv",
+                             usecols=["product_id", "reordered"])
+
+products_full = (products
+    .merge(aisles, on="aisle_id")
+    .merge(departments, on="department_id"))
+
+overall_reorder = order_products["reordered"].mean()
+
+product_stats = (
+    order_products.groupby("product_id")
+    .agg(count=("product_id", "size"), reorder_rate=("reordered", "mean"))
+    .reset_index()
+    .merge(products_full[["product_id", "department"]], on="product_id")
+)
+top5_depts = (
+    product_stats.groupby("department")["count"].sum()
+    .sort_values(ascending=False).head(5).index.tolist()
+)
+product_stats["segment"] = product_stats["department"].isin(top5_depts).map(
+    {True: "Top-5 departments", False: "Other departments"}
+)
+plot_df = product_stats[product_stats["count"] >= 100]
+
+BAR_COLOR = "#FB6A4A"
+sns.set_theme(style="whitegrid")
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.scatterplot(
+    data=plot_df, x="count", y="reorder_rate", hue="segment",
+    palette={"Top-5 departments": "#D9D9D9", "Other departments": BAR_COLOR},
+    s=12, alpha=0.4, edgecolor="none", ax=ax
+)
+ax.set_xscale("log")
+ax.axhline(overall_reorder, color="#555555", linestyle="--", linewidth=1)
+ax.text(plot_df["count"].max() * 0.5, overall_reorder + 0.03,
+        f"overall reorder rate ({overall_reorder:.0%})", fontsize=8, color="#555555")
+ax.set_xlabel("Number of purchases (log scale)")
+ax.set_ylabel("Reorder rate")
+ax.set_ylim(0, 1)
+ax.legend(title="")
+sns.despine()
+plt.tight_layout()
+plt.show()
+```
+
+Hundreds of low-volume products outside the dominant departments exceed the platform's overall reorder rate of roughly 58%. These are the hidden gems of the assortment: niche items — specialty wines, artisan breads, premium deli meats — with small but highly loyal customer bases that standard sales reports make invisible.
+
+**For buyers:** A supplier negotiation requires more than a top-seller list. The scatter above makes a quantitative case for products that score on loyalty rather than volume — the starting point for targeted promotions, subscription nudges, or retention-focused campaigns. The dashboard's **Reorder Rate** and **Hidden Gems** views make this analysis interactive and filterable.
+
+### What belongs next to what?
+
+Raw co-purchase counts tell us which categories are large — not which ones genuinely belong together. When Produce appears in every top department pair, that reflects its size, not a meaningful affinity. Replacing raw frequency with **lift** removes this size bias: a lift of 2.0 means a pair appears together twice as often as chance would predict given each category's individual popularity. @fig-aisle-lift shows the 15 strongest aisle-level associations by lift, restricted to pairs with at least 2,000 shared orders to exclude fragile combinations.
+
+```{python}
+#| label: fig-aisle-lift
+#| fig-cap: "Top 15 aisle pairs by lift (minimum 2,000 shared orders). The dashed line marks lift = 1.0 (statistical independence)."
+#| echo: true
+#| code-fold: true
+from pathlib import Path
+from itertools import combinations
+from collections import Counter
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+data_dir = Path().resolve().parent / "data"
+products = pd.read_csv(data_dir / "products.csv", usecols=["product_id", "aisle_id"])
+aisles = pd.read_csv(data_dir / "aisles.csv")
+op = pd.read_csv(data_dir / "order_products__prior.csv",
+                 usecols=["order_id", "product_id"],
+                 dtype={"order_id": "int32", "product_id": "int32"})
+
+pid2aid = dict(zip(products["product_id"], products["aisle_id"]))
+aid2name = dict(zip(aisles["aisle_id"], aisles["aisle"]))
+
+op["aisle_id"] = op["product_id"].map(pid2aid).astype("int16")
+op = op[["order_id", "aisle_id"]].drop_duplicates()
+
+n_orders = int(op["order_id"].nunique())
+count_a = op.groupby("aisle_id")["order_id"].size().to_dict()
+grouped = op.groupby("order_id")["aisle_id"].agg(list)
+
+pair_counts: Counter = Counter()
+for ais in grouped:
+    for a, b in combinations(sorted(set(ais)), 2):
+        pair_counts[(a, b)] += 1
+
+MIN_CO_ORDERS = 2000
+drop_names = {"missing", "other"}
+rows = []
+for (a, b), c in pair_counts.items():
+    if c < MIN_CO_ORDERS:
+        continue
+    name_a = aid2name.get(a, str(a))
+    name_b = aid2name.get(b, str(b))
+    if name_a in drop_names or name_b in drop_names:
+        continue
+    lift = c * n_orders / (count_a[a] * count_a[b])
+    rows.append({"aisle_1": name_a, "aisle_2": name_b, "co_orders": c, "lift": lift})
+
+top_lift = (
+    pd.DataFrame(rows)
+    .sort_values("lift", ascending=False)
+    .head(15)
+)
+top_lift["pair_label"] = top_lift["aisle_1"] + "  +  " + top_lift["aisle_2"]
+
+BAR_COLOR = "#FB6A4A"
+sns.set_theme(style="whitegrid")
+plt.rcParams["axes.titleweight"] = "bold"
+
+fig, ax = plt.subplots(figsize=(11, 6))
+sns.barplot(data=top_lift.sort_values("lift"), x="lift", y="pair_label",
+            color=BAR_COLOR, ax=ax)
+ax.axvline(1.0, color="#555555", linestyle="--", linewidth=1)
+ax.set_xlabel("Lift  (1.0 = independent; higher = bought together more than chance predicts)")
+ax.set_ylabel("")
+ax.bar_label(ax.containers[0], fmt="%.1f×", padding=3, fontsize=8)
+sns.despine(left=True, bottom=True)
+plt.tight_layout()
+plt.show()
+```
+
+The lift ranking reveals three clear shopping-basket themes that raw counts miss entirely. Wine aisles dominate the top: red and white wines are bought together roughly 40 times more often than chance would predict. Below the alcohol cluster, a personal care theme emerges (oral hygiene, deodorants, hair care), followed by a baking cluster (baking supplies paired with dough and mixes) and a household cleaning cluster (laundry with cleaning products). None of these relationships would surface from a frequency ranking, where every top pair would simply include Produce.
+
+This aisle-level lift analysis is the analytical foundation of the dashboard's **Aisles Bought Together** page. The shopping-basket themes visible in the bar chart correspond directly to the colour-coded communities in the interactive network graph — the chart and the network are two views of the same underlying structure.
+
+### When do customers shop?
+
+The dataset records no absolute calendar dates, only day of week and hour of day. @fig-shopping-heatmap encodes order volume across both dimensions simultaneously — a pattern that any single average or marginal distribution would obscure.
 
 ```{python}
 #| label: fig-shopping-heatmap
@@ -342,7 +633,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-@fig-shopping-heatmap confirms the pattern described above: orders cluster on Sunday and Monday between roughly 09:00 and 15:00, and activity drops off sharply in the evening. The dashboard uses the same logic to build its shopping time view, which means the heatmap above also acts as a sanity check on the live application.
+Orders cluster sharply on Sundays and Mondays between 09:00 and 15:00 — the weekly grocery planning window. Activity drops near zero before 06:00 and after 22:00 on every day of the week. The peak is not a gradual rise but a concentrated band, consistent with deliberate weekly planning rather than impulsive shopping. Promotional campaigns timed to this window reach customers when they are actively placing orders; late-evening promotions would find almost no audience.
+
+### From data to decisions
+
+The four findings above describe the same customer from different angles: a habitual, health-conscious buyer who anchors every visit in Produce and Dairy, shops on a predictable Sunday-to-Monday morning schedule, builds strong routines around a handful of staples, and occasionally discovers a niche product they then purchase repeatedly.
+
+The dashboard is designed to make exactly these patterns accessible without requiring either Sandra or Marco to run queries or produce charts themselves. Each page in the dashboard corresponds directly to one of the four questions answered here: **Top Sellers** and **Department Sales** for volume, **Reorder Rate** and **Hidden Gems** for loyalty, **Aisles Bought Together** for co-purchase structure, and **Shopping Time Heatmap** for temporal patterns. The exploratory analysis is not separate from the product — it is the product, made interactive.
 
 ## Summary
 
