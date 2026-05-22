@@ -1,6 +1,6 @@
 # Project Charta – Group 11
 **Grocery Product Placement Analysis**
-*Course: Visualisation and Data Science Storytelling II – ZHAW, FS 2025/26*
+*Course: Visualisation and Data Science Storytelling II – ZHAW, FS 2026*
 *Team: Lara Pestrin, Jonathan Kull, Veprim Mehmeti*
 
 ---
@@ -14,8 +14,8 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 **Research questions addressed:**
 
 - Which products are purchased most frequently?
-- Which products are commonly bought together (co-purchase patterns / market basket analysis)?
-- Which products have the highest customer loyalty, as measured by reorder rate?
+- Which product categories (aisles) are commonly bought together (co-purchase patterns / market basket analysis)?
+- Which product categories have the highest customer loyalty, as measured by reorder rate?
 - At what times of day and days of the week are orders placed most often?
 - What recommendations can be derived for product assortment, placement, and retention strategies?
 
@@ -31,7 +31,7 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 
 1. **KPI Overview**: Users can access key dataset metrics (total orders, unique products, customers, reorder rate, peak shopping hour, top department) at a glance on a summary page.
 2. **Product Development – Top Sellers & Department Sales**: Users can identify the most frequently purchased products and compare sales volumes across all product departments.
-3. **Product Development – Co-Purchase Analysis**: Users can explore which products are commonly bought together, using an interactive 3D network graph filtered by lift score and pair frequency.
+3. **Product Development – Co-Purchase Analysis**: Users can explore which product categories (aisles) are commonly bought together — through a ranked co-purchase pair table, a department-level heatmap, and an interactive aisle-level network graph filtered by lift score and pair frequency.
 4. **Customer Retention – Reorder Rate & Hidden Gems**: Users can identify the most loyal product categories, including niche products with small but highly loyal customer bases.
 5. **Customer Retention – Temporal Patterns**: Users can understand peak ordering times (day of week × hour of day) to inform promotion timing and operational planning.
 
@@ -39,10 +39,10 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 
 | Criterion | Measure | Target |
 |---|---|---|
-| Comprehensibility | User can identify key insights in < 2 min (user test) | ≥ 80% of test participants |
-| Usability | Navigation and filters work without instructions | Yes (usability test) |
+| Comprehensibility | Every view states its key analytical finding in a plain-language insight callout | All 7 views |
+| Self-explanatory UI | Navigation and every filter/slider carry inline help; the dashboard is usable without external instructions | Yes |
 | Completeness | All 5 project objectives addressed in the dashboard | 100% |
-| Data coverage | Instacart dataset fully integrated (incl. temporal data and reorder info) | Yes |
+| Data coverage | Instacart dataset fully integrated (incl. temporal and reorder data) | Yes |
 
 ### Out of Scope
 
@@ -60,8 +60,8 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 |---|---|---|
 | **Assortment Planner** | Primary target audience | Optimise product range, identify popular products and co-purchase patterns |
 | **Category Manager / Buyer** | Secondary target audience | Data basis for listing/delisting decisions; identify loyal and niche products |
-| **Prof. Dr. Wibke Weber** | Course supervisor (ZHAW) | Visualisation quality, communicative value |
-| **Manuel Dömer** | Course supervisor / client (ZHAW) | Correct application of the data science process, visualisation focus |
+| **Prof. Dr. Wibke Weber** | Course Director (ZHAW) | Visualisation quality, communicative value |
+| **Manuel Dömer** | Course supervisor (ZHAW) | Correct application of the data science process, visualisation focus |
 | **Group 11** | Development team | Build the visualisation product and deliver all required documentation |
 
 ---
@@ -93,7 +93,7 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 **Gains:**
 
 - Fast visual overview of top products without manual data preparation
-- Immediate view of "frequently bought together" products via the network graph
+- Immediate view of which categories are "frequently bought together" via the co-purchase network
 - Professional, trustworthy data foundation for internal presentations
 
 ---
@@ -122,7 +122,7 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 
 **Gains:**
 
-- Instant view of co-purchase clusters and reorder loyalty per product
+- Instant view of co-purchase clusters and reorder loyalty per category
 - Data-driven arguments for supplier conversations
 - Discovery of hidden gems to differentiate the assortment beyond mainstream categories
 
@@ -136,7 +136,7 @@ This project analyses the **Instacart Online Grocery Shopping Dataset (2017)**, 
 |---|---|
 | **Data** | Instacart Online Grocery Dataset (2017), sourced from [Kaggle](https://www.kaggle.com/code/tanjaadzic/instacart-dataset-2017-exploration-and-analysis). ~3.4 million orders, 206k users, 49k products. See Data Catalogue below. |
 | **Personnel** | 3 team members (Lara Pestrin, Jonathan Kull, Veprim Mehmeti) |
-| **Software** | Python (Pandas, Plotly, Streamlit, NetworkX, Seaborn, Matplotlib), GitHub, Quarto |
+| **Software** | Python 3.12 — dashboard: Pandas, NumPy, Plotly, Streamlit; EDA: Jupyter, matplotlib, seaborn; data download: kagglehub. GitHub for version control; Quarto for documentation |
 | **Infrastructure** | Local development; GitHub repository for version control and submission |
 | **Supervision** | ZHAW supervisors (Weber, Dömer) with regular feedback rounds |
 
@@ -153,7 +153,7 @@ The Instacart dataset consists of six CSV files. All data is fully anonymised; n
 | `aisles.csv` | 134 | `aisle_id`, `aisle` | Sub-category labels, e.g. "fresh vegetables", "yogurt". |
 | `departments.csv` | 21 | `department_id`, `department` | Top-level category labels, e.g. "produce", "dairy eggs", "beverages". |
 
-In addition, the co-purchase / market basket analysis (co-occurrence frequencies and lift scores) is computed at runtime from `order_products__prior.csv` to power the network graph view; no separate pre-computed files are required.
+In addition, the aisle-level co-purchase / market basket analysis (co-occurrence frequencies and lift scores) is computed at runtime from `order_products__prior.csv`, joined to `products.csv` and `aisles.csv`, to power the co-purchase views (pair table, department heatmap, and aisle network); no separate pre-computed files are required.
 
 **Key data characteristics and limitations:**
 
@@ -165,7 +165,7 @@ In addition, the co-purchase / market basket analysis (co-occurrence frequencies
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| Network graph computation time | High | Aggregations computed once and cached via Streamlit `@st.cache_data`; Top-N sliders limit the size of the rendered graph |
+| Co-purchase aggregation over the 32 M-row prior table is slow | High | Aggregations computed once and cached via Streamlit `@st.cache_data`; the co-purchase analysis runs at aisle level (134 aisles), keeping the network small and fast to render |
 | Dataset too large for in-memory processing | Medium | Data aggregated before rendering; Top-N sliders limit display size |
 | No absolute dates available | Known | Visualise hour of day and day of week only; limitation documented in data report |
 | Time pressure before submission | High | Core views (KPI, Top Sellers, Heatmap) prioritised; network graph added once stable |
@@ -176,16 +176,16 @@ In addition, the co-purchase / market basket analysis (co-occurrence frequencies
 
 ### Product Form
 
-**Interactive multi-page dashboard** built with Python Streamlit – an exploratory decision-support tool for assortment planners and buyers. The dashboard is organised into **two main sections** accessible via the sidebar, each with sub-pages:
+**Interactive multi-page dashboard** built with Python Streamlit – an exploratory decision-support tool for assortment planners and buyers. Navigation uses a sidebar radio menu with **three entries**: a single-page KPI Overview as the landing page, plus two multi-page sections that mirror the two strategic dimensions of the business.
 
-**Section 1 – KPI Overview** (landing page)
+**KPI Overview** – landing page
 
-**Section 2 – Product Development**
+**Section 1 – Product Development**
 - Top Sellers
 - Department Sales
-- Products Bought Together
+- Aisles Bought Together (co-purchase analysis)
 
-**Section 3 – Customer Retention**
+**Section 2 – Customer Retention**
 - Reorder Rate
 - Hidden Gems
 - Shopping Time Heatmap
@@ -197,27 +197,29 @@ In addition, the co-purchase / market basket analysis (co-occurrence frequencies
 | KPI Overview | Metric tiles (6 KPIs) | Streamlit `st.metric` | Immediate orientation; key numbers at a glance without cognitive overhead |
 | Top Sellers | Horizontal bar chart, colour-encoded by count | Plotly Express | Clear rank comparison; colour reinforces magnitude |
 | Department Sales | Horizontal bar chart, colour-encoded by count | Plotly Express | Enables cross-category comparison at the same scale |
-| Products Bought Together | Interactive 3D network graph (nodes = products, edges = lift-weighted co-purchases, community detection for colour clusters) | Plotly + NetworkX | Reveals relational structure of the assortment; community clusters map to natural product groups |
+| Aisles Bought Together | Ranked co-purchase pair table, department × department heatmap, and 2D force-directed network graph (nodes = aisles, edges = lift-weighted co-purchases, modularity-based colour clusters) | Plotly; custom NumPy layout & clustering | Three complementary lenses on co-purchase — concrete pairs, category overview, and relational structure; the aisle level keeps the network legible (134 nodes vs. 49k products) |
 | Reorder Rate | Horizontal bar chart, colour-encoded by rate | Plotly Express | Rank of loyalty scores; consistent visual language with Top Sellers |
 | Hidden Gems | Horizontal bar chart, colour-encoded by rate | Plotly Express | Same encoding; filtered to non-dominant departments to surface niche products |
-| Shopping Time Heatmap | Heatmap (day of week × hour of day), YlOrRd colour scale | Seaborn / Matplotlib | Ideal for two-dimensional frequency patterns; peak times immediately visible |
+| Shopping Time Heatmap | Heatmap (day of week × hour of day) with marginal bar charts, YlOrRd colour scale | Plotly | Ideal for two-dimensional frequency patterns; peak times immediately visible |
 
 ### Interactivity
 
 - **Sidebar navigation**: Radio buttons to switch between sections and sub-pages without page reload
 - **Sliders**:
-  - Top Sellers / Reorder Rate / Hidden Gems: control number of products displayed (5–50)
-  - Network graph: `Top-N Products` (50–500), `Minimum pair count` (10–200), `Minimum lift` (1.0–5.0)
+  - Top Sellers / Reorder Rate / Hidden Gems: control how many items are displayed (5–50)
+  - Co-purchase pair table: `Pairs · min co-orders` (500–20 000), `Pairs · min lift` (1.0–3.0), `Show top N pairs` (5–50)
+  - Co-purchase network: `Network · min co-orders` (500–20 000), `Network · min lift` (1.0–3.0), `Show labels for top N aisles` (5–60)
   - Hidden Gems: `Exclude top N departments` and `Minimum number of purchases` thresholds
-- **Tooltips**: Plotly charts provide detail-on-demand on hover (product name, count, lift)
-- **Caching**: All data loading and network computations cached via `@st.cache_data` for fast interactions
+- **Filters**: Shopping Time Heatmap can be filtered by customer type
+- **Tooltips**: Plotly charts provide detail-on-demand on hover (aisle name, count, lift)
+- **Caching**: All data loading and co-purchase computations cached via `@st.cache_data` for fast interactions
 
 ### Narrative and Annotation
 
 - **KPI Overview page** provides a written summary contextualising the key metrics (e.g. habitual customer base, dominance of produce)
 - **Each sub-page** includes a one-paragraph markdown description explaining what the chart shows and how to read it
 - **`st.info` callouts** on every page highlight the most important analytical finding in plain language (e.g. "Bananas are the most purchased product…", "Most orders are placed on Sundays and Mondays between 9:00 and 15:00")
-- **Network graph** includes a detailed how-to-use guide explaining lift, cross-sell, bundling, and placement implications
+- **Co-purchase page** includes a detailed how-to-use guide explaining lift, cross-sell, bundling, and placement implications
 
 ### Target Medium
 
@@ -230,7 +232,7 @@ streamlit run app.py
 ### Value Dimensions
 
 **Cognitive and analytical value:**
-The 3D network graph with community detection surfaces relational structure in the assortment that is completely invisible in tabular data – product clusters map directly to natural shopping bundles. The heatmap encodes two-dimensional frequency data (day × hour) in a format that makes peak periods immediately perceptible without any calculation [@card1999]. The consistent horizontal bar chart language across all ranking views reduces cognitive load by applying the same visual grammar throughout the dashboard.
+The aisle-level network graph with community detection surfaces relational structure in the assortment that is invisible in tabular data – aisle clusters map directly to natural shopping bundles. A 2D layout was chosen deliberately over 3D: node positions in a force-directed graph carry no quantitative meaning, and a 2D view stays legible in static exports such as the report and presentation. The heatmap encodes two-dimensional frequency data (day × hour) in a format that makes peak periods immediately perceptible without any calculation [@card1999]. The consistent horizontal bar chart language across all ranking views reduces cognitive load by applying the same visual grammar throughout the dashboard.
 
 **Communicative value:**
 Each view is self-contained with a title, explanatory text, and a highlighted insight callout – users with medium data literacy can extract the key message without reading documentation. The sidebar structure mirrors the two strategic dimensions of the business (product development and customer retention), aligning the tool's architecture directly with the user's mental model [@vanwijk2005].
@@ -251,34 +253,33 @@ gantt
     tickInterval 7day
 
     section Project Understanding
-        Topic selection & dataset research         :done, a1, 2026-02-16, 7d
-        Stakeholder & user analysis                :done, a2, 2026-02-23, 7d
-        Visualisation concept                      :done, a3, 2026-03-01, 7d
-        Project Charta v1                          :done, milestone, m1, 2026-03-08, 1d
-        Supervisor feedback & Charta revision      :done, a4, 2026-03-28, 14d
+        Topic selection & dataset research          :done, a1, 2026-02-16, 7d
+        Stakeholder & user analysis                 :done, a2, 2026-02-23, 7d
+        Visualisation concept                       :done, a3, 2026-03-02, 12d
+        Project Charta draft submitted              :done, milestone, m1, 2026-03-20, 1d
+        Supervisor feedback & Charta revision       :done, a4, 2026-03-23, 14d
 
     section Data Acquisition & Exploration
-        Load & clean Instacart data                :done, a5, 2026-03-15, 7d
-        Exploratory data analysis (EDA)            :done, a6, 2026-03-22, 7d
-        Data report                                :active, a7, 2026-04-05, 14d
+        Load Instacart data (data_acquisition)      :done, a5, 2026-03-16, 10d
+        Exploratory data analysis (eda)             :done, a6, 2026-03-26, 18d
 
     section Visualisation & Implementation
-        Top products & department sales            :done, a8, 2026-04-01, 10d
-        Co-purchase network graph                  :done, a9, 2026-04-10, 10d
-        Reorder rate & hidden gems                 :done, a10, 2026-04-15, 7d
-        Shopping time heatmap                      :done, a11, 2026-04-18, 7d
-        Dashboard integration & styling (app.py)   :done, a12, 2026-04-22, 8d
+        Top sellers & department sales              :done, a7, 2026-04-06, 10d
+        Aisle co-purchase analysis                  :done, a8, 2026-04-13, 16d
+        Reorder rate & hidden gems                  :done, a9, 2026-04-20, 8d
+        Shopping time heatmap                       :done, a10, 2026-04-24, 7d
+        Dashboard integration & styling (deployment) :done, a11, 2026-04-29, 16d
 
     section Finalisation
-        Evaluation                                 :done, a13, 2026-04-25, 7d
-        Visualisation report                       :active, a14, 2026-04-28, 7d
-        Project Charta finalisation                :active, a15, 2026-05-01, 5d
-        README                                     :active, a16, 2026-05-03, 4d
-        Final presentation preparation             :a17, 2026-05-05, 7d
-        Final presentation                         :milestone, m2, 2026-05-12, 1d
+        README                                      :done, a12, 2026-05-03, 5d
+        Repo cleanup & restructuring                 :done, a13, 2026-05-18, 4d
+        Data report (docs)                           :active, a14, 2026-05-05, 21d
+        Project Charta finalisation (docs)           :active, a15, 2026-05-20, 7d
+        Presentation preparation                     :active, a16, 2026-05-12, 18d
+        Deployment - dashboard & Quarto docs site    :a17, 2026-05-27, 5d
+        Final submission (Moodle)                    :crit, milestone, m2, 2026-06-01, 1d
+        Oral group presentation (exam period)        :milestone, m3, 2026-06-15, 1d
 ```
-
-See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html). May not render correctly in Safari → use Chrome. [Live editor](https://mermaid.live/)
 
 ---
 
@@ -286,8 +287,8 @@ See [Mermaid syntax for Gantt charts](https://mermaid.js.org/syntax/gantt.html).
 
 | Name | Role | Tasks | Contact |
 |---|---|---|---|
-| **Lara Pestrin** | Project Lead & Documentation | Project communication, evaluation (with Jonathan), Project Charta, README | peslar01@students.zhaw.ch |
-| **Jonathan Kull** | Development & Evaluation | Dashboard implementation (`app.py`), evaluation (with Lara) | kulljon1@students.zhaw.ch |
-| **Veprim Mehmeti** | Data Analysis & Documentation | Exploratory data analysis (EDA), data report | mehmevep@students.zhaw.ch |
-| **Manuel Dömer** | Supervisor (ZHAW) | Content feedback, project sign-off | doem@zhaw.ch |
+| **Lara Pestrin** | Project Lead & Documentation | Project communication, Project Charta, `app.py`, README | peslar01@students.zhaw.ch |
+| **Jonathan Kull** | Development | Dashboard implementation (`app.py`, views, co-purchase network) | kulljon1@students.zhaw.ch |
+| **Veprim Mehmeti** | Data Analysis & Documentation | Data acquisition, exploratory data analysis (EDA), data report | mehmevep@students.zhaw.ch |
+| **Manuel Dömer** | Course supervisor (ZHAW) | Content feedback, project sign-off | doem@zhaw.ch |
 | **Prof. Dr. Wibke Weber** | Course Director (ZHAW) | Visualisation concept, communicative quality | webw@zhaw.ch |
