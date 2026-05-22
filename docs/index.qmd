@@ -10,17 +10,21 @@ Storytelling II* (ZHAW, FS 2025/26) by Group 11 (Lara Pestrin, Jonathan Kull,
 Veprim Mehmeti).
 
 The project — **Grocery Product Placement Analysis** — analyses the Instacart
-Online Grocery Shopping Dataset (2017) to understand grocery purchasing
-patterns. It explores which products are bought most frequently, which products
-are commonly bought together (market basket analysis), and which products show
-the highest customer loyalty as measured by reorder rate. The insights are
-communicated through an interactive dashboard that supports data-driven
-recommendations for product placement and category organisation.
+Online Grocery Shopping Dataset (2017) to uncover actionable patterns in
+grocery purchasing behaviour. Effective product placement is one of the most
+impactful levers available to retailers, yet decisions are often made on
+intuition rather than data. This project addresses that gap: it explores which
+products are bought most frequently, which products are commonly bought together
+(market basket analysis), and which products show the highest customer loyalty
+as measured by reorder rate. The resulting insights are communicated through an
+interactive Streamlit dashboard that supports data-driven recommendations for
+product placement and category organisation.
 
 ![The visualisation product development process](pics/vizproductprocess.png){#fig-vizprocess}
 
 The methodological procedure follows the process model shown in
-@fig-vizprocess. This documentation comprises the following sections:
+@fig-vizprocess. This documentation focuses on the two required components and
+comprises the following sections:
 
 - **[Project Charta](project_charta.qmd)** — context and scope, stakeholder and
   user analysis (including personas), project objectives, success criteria,
@@ -29,5 +33,6 @@ The methodological procedure follows the process model shown in
   acquisition and processing steps, and the exploratory data analysis that
   informs the visualisations.
 
-The interactive visualisation product itself is a Streamlit dashboard. See the
-project `README` for instructions on how to set up the environment and run it.
+Setup instructions and environment requirements for running the interactive
+dashboard locally are provided in the project `README.md` at the root of the
+repository.
