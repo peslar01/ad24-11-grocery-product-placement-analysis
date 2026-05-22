@@ -3,8 +3,6 @@ title: "Data Report"
 format: html
 ---
 
-# Data Report
-
 This report documents the data used in the project. It covers the raw datasets, the processing steps that produce the working data, and the exploratory analysis that informs the visualisations. The goal is to make the data side of the project traceable and reproducible for anyone joining later.
 
 ## Raw data
@@ -93,7 +91,7 @@ The exploratory analysis is implemented in `eda/eda.ipynb`. The most relevant fi
 
 **Completeness.** The only missing values in the raw data appear in `days_since_prior_order`. The number of missing entries (206,209) matches the number of unique users in the dataset, which confirms that the missing values are not a quality defect but an expected artefact of the first order per user. All other columns are complete.
 
-**Univariate summaries.** Numerical variables are profiled with the standard summary statistics from the template (mean, median, quantiles, range, standard deviation). The summary is produced directly from the raw files:
+**Univariate summaries.** The three numerical variables most relevant to the dashboard are profiled with standard descriptive statistics (mean, median, quartiles, range, standard deviation): `add_to_cart_order` as a proxy for basket size, `days_since_prior_order` as the key measure of shopping frequency, and `order_hour_of_day` as the basis for the temporal analysis. The summary is produced directly from the raw files:
 
 ```{python}
 #| label: tbl-univariate
@@ -139,7 +137,10 @@ The variables behave as expected. `add_to_cart_order` is right skewed because mo
 
 | Name | Source | Storage location |
 |---|---|---|
-| Merged product master table (`products_full`) | `products.csv` merged with `aisles.csv` and `departments.csv` | Created in memory in `deployment/app.py` and `eda/*.ipynb` |
+| Merged product master table (`products_full`) | `products.csv` merged with `aisles.csv` and `departments.csv` | Created in memory in `deployment/data_loaders.py` (`load_csv`) and `eda/*.ipynb` |
+| Per-product statistics (`product_stats`) | `order_products__prior.csv` grouped by `product_id`, enriched with `products_full` | Created in memory in `deployment/data_loaders.py` (`product_stats`) |
+| Aisle aggregates (`aisle_aggregates`) | `order_products__prior.csv` grouped by `(department, aisle)`, enriched with `products_full` | Created in memory in `deployment/data_loaders.py` (`aisle_aggregates`) |
+| Aisle co-purchase pairs (`top_aisle_pairs`) | Aisle-level co-occurrence counts and lift values derived from `order_products__prior.csv` | Created in memory in `deployment/data_loaders.py` (`top_aisle_pairs`, `dept_pair_matrix`) |
 
 ### Details: Merged Product Master Table
 
@@ -177,9 +178,123 @@ products_full = (
 | `department_id` | integer | foreign key | Department the product belongs to. |
 | `department` | string | not null | Department label. |
 
-## Order frequency heatmap
+### Details: Per-Product Statistics
 
-The following figure reproduces the shopping time analysis from `eda/eda.ipynb` and `deployment/app.py`. It is one of the most informative views of the raw data, since it shows the only temporal pattern that the dataset actually allows.
+#### Description
+
+This table aggregates purchase behaviour at the individual product level. It is the single source of truth for "how often is product X bought, and how loyal are its customers?" and is used by the Top Sellers, Reorder Rate, and Hidden Gems views in the dashboard.
+
+#### Processing steps
+
+1. Group `order_products__prior.csv` by `product_id`.
+2. Compute `count` (total number of times the product was purchased) and `reorder_rate` (mean of the binary `reordered` column).
+3. Compute `share_pct` as each product's count divided by the total number of line items.
+4. Merge with `products_full` to add `product_name`, `department`, and `aisle`.
+
+The table is rebuilt at runtime from the cached `load_csv()` result.
+
+#### How to access
+
+```python
+stats = (
+    order_products.groupby("product_id")
+    .agg(count=("product_id", "size"),
+         reorder_rate=("reordered", "mean"))
+    .reset_index()
+)
+stats["share_pct"] = stats["count"] / stats["count"].sum() * 100
+product_stats = stats.merge(
+    products_full[["product_id", "product_name", "department", "aisle"]],
+    on="product_id",
+)
+```
+
+#### Data Catalogue
+
+| Column | Datatype | Range or validation | Short description |
+|---|---|---|---|
+| `product_id` | integer | foreign key | Product identifier. |
+| `count` | integer | >= 1 | Total number of purchases across all orders. |
+| `reorder_rate` | float | 0 to 1 | Share of purchases that were reorders. |
+| `share_pct` | float | 0 to 100 | This product's share of all line items. |
+| `product_name` | string | not null | Human readable product name. |
+| `department` | string | not null | Department label. |
+| `aisle` | string | not null | Aisle label. |
+
+### Details: Aisle Aggregates
+
+#### Description
+
+This table pre-aggregates purchase count and reorder statistics at the `(department, aisle)` level. It reduces the 32-million-row line item table to 134 rows and is used by the Department Sales views.
+
+#### Processing steps
+
+1. Join `order_products__prior.csv` with `products_full` on `product_id` to attach `department` and `aisle`.
+2. Group by `(department, aisle)`.
+3. Compute `count` (line items), `reorder_sum`, `reorder_rate`, and `share_pct`.
+
+#### How to access
+
+```python
+op = order_products.merge(
+    products_full[["product_id", "department", "aisle"]],
+    on="product_id",
+)
+aisle_aggregates = (
+    op.groupby(["department", "aisle"])
+    .agg(count=("product_id", "size"), reorder_sum=("reordered", "sum"))
+    .reset_index()
+)
+aisle_aggregates["reorder_rate"] = aisle_aggregates["reorder_sum"] / aisle_aggregates["count"]
+aisle_aggregates["share_pct"] = aisle_aggregates["count"] / aisle_aggregates["count"].sum() * 100
+```
+
+#### Data Catalogue
+
+| Column | Datatype | Range or validation | Short description |
+|---|---|---|---|
+| `department` | string | not null | Department label. |
+| `aisle` | string | not null | Aisle label. |
+| `count` | integer | >= 1 | Total purchase line items for this aisle. |
+| `reorder_sum` | integer | >= 0 | Number of reordered line items. |
+| `reorder_rate` | float | 0 to 1 | Share of purchases that were reorders. |
+| `share_pct` | float | 0 to 100 | Aisle's share of all line items. |
+
+### Details: Aisle Co-Purchase Pairs
+
+#### Description
+
+This dataset captures how often pairs of aisles appear in the same order, and expresses the strength of each association as a lift value. It is the analytical basis for the Products Bought Together view and the department-level co-occurrence heatmap in the dashboard.
+
+#### Processing steps
+
+1. For each order, collect the set of distinct aisles it contains.
+2. For each unordered pair of aisles `(a, b)`, count the number of orders in which both appear (`co_orders`).
+3. Compute lift as `co_orders × n_orders / (count_a × count_b)`, where `count_a` and `count_b` are the individual order frequencies of each aisle.
+4. Filter out pairs below a minimum count (default 1,000) and a minimum lift (default 1.3).
+5. For the dashboard heatmap, aggregate the pair counts into a symmetric department × department matrix (`dept_pair_matrix`).
+
+The heavy counting step (`compute_aisle_pairs`) runs once and is cached by Streamlit. All downstream views receive the cached result.
+
+#### Data Catalogue
+
+| Column | Datatype | Range or validation | Short description |
+|---|---|---|---|
+| `aisle_a` | string | not null | First aisle in the pair. |
+| `department_a` | string | not null | Department of `aisle_a`. |
+| `aisle_b` | string | not null | Second aisle in the pair. |
+| `department_b` | string | not null | Department of `aisle_b`. |
+| `co_orders` | integer | >= min_count | Number of orders containing both aisles. |
+| `share_of_orders` | float | 0 to 100 | Co-orders as a percentage of all orders. |
+| `lift` | float | >= min_lift | Lift value: observed co-occurrence divided by expected under independence. |
+
+## Exploratory Analysis
+
+The exploratory analysis is implemented in `eda/eda.ipynb`. The key findings are summarised in the data characteristics section above. The figure below reproduces the most informative view: the shopping time pattern, which is also the only temporal pattern the dataset allows.
+
+### Order frequency heatmap
+
+The following figure reproduces the shopping time analysis from `eda/eda.ipynb` and `deployment/app.py`.
 
 ```{python}
 #| label: fig-shopping-heatmap
