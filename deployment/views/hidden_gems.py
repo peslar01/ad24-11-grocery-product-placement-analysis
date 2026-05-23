@@ -11,8 +11,8 @@ def render():
     st.markdown(
         "Hidden Gems are products that sit **outside the top-selling departments** "
         "and inside a chosen **purchase-volume range** (so we focus on the long tail, "
-        "not blockbusters) — yet still achieve exceptionally high reorder rates. "
-        "They surface niche categories with small but devoted customer bases — "
+        "not blockbusters), yet still achieve exceptionally high reorder rates. "
+        "They surface niche categories with small but devoted customer bases, "
         "the strongest candidates for targeted promotions, category newsletters, "
         "and subscription offers."
     )
@@ -32,7 +32,7 @@ def render():
             "Purchase-count range (long-tail window)",
             min_value=100, max_value=10000, value=(300, 3000), step=100,
             help="Restrict to products bought within this range. The upper bound "
-                 "keeps the focus on niche products — not blockbusters that just "
+                 "keeps the focus on niche products, not blockbusters that just "
                  "happened to sit outside the top departments.",
         )
     with col_f3:
@@ -79,7 +79,7 @@ def render():
     st.caption(
         f"**{eligible_count:,}** products fall inside the long-tail window "
         f"({min_purchases:,}–{max_purchases:,} purchases) and outside the "
-        f"excluded departments — showing the top {len(hidden_gems)} by reorder rate."
+        f"excluded departments, showing the top {len(hidden_gems)} by reorder rate."
     )
 
     fig = px.bar(

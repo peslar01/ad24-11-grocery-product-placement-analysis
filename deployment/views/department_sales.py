@@ -17,7 +17,7 @@ def render():
         f"Compares total purchase volume across product categories. "
         f"Switch between the **Department** view ({n_depts} broad categories) and the "
         f"**Aisle** view ({n_aisles} finer-grained aisles) to see exactly which sub-categories "
-        "drive sales — e.g. *produce* splits into *fresh fruits*, *fresh vegetables*, "
+        "drive sales, e.g. *produce* splits into *fresh fruits*, *fresh vegetables*, "
         "*fresh herbs*, *packaged produce* and *packaged vegetables fruits*."
     )
 

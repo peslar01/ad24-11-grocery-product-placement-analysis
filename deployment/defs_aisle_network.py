@@ -7,7 +7,7 @@ This module performs *aisle-level* co-purchase / market basket analysis.
 Why aisle level?
     The top products on Instacart are overwhelmingly fresh produce, while
     categories like pasta or snacks are split across hundreds of separate
-    SKUs — so none of them individually reaches the top of the ranking and
+    SKUs, so none of them individually reaches the top of the ranking and
     no "pasta cluster" or "snack cluster" can form. Grouping every product
     into its aisle (134 aisles) removes that fragmentation: every pasta SKU
     becomes one strong "dry pasta" node, every chip SKU one "chips pretzels"
@@ -328,8 +328,8 @@ def build_figure(nodes, edges, node_comm, pos, count_a, aid2name,
     """Build an interactive 2D *or* 3D network figure of the aisle co-purchase graph.
 
     aisle_info       optional {aisle_id: {department, share_pct, reorder_rate}}
-                     — used to enrich the node hover tooltip.
-    cluster_names    optional {cluster_idx: str} — used as the legend label.
+                     , used to enrich the node hover tooltip.
+    cluster_names    optional {cluster_idx: str}, used as the legend label.
     focus_aisle_id   if given, edges *not* connected to this aisle and nodes
                      *not* in its 1-hop neighbourhood are visually dimmed.
     label_top_n      show text labels only on this many largest aisles (the

@@ -15,11 +15,11 @@ def render():
     st.title("Aisles Bought Together")
 
     st.markdown(
-        "Three views of the same question — *what is bought with what?* — "
+        "Three views of the same question, *what is bought with what?*, "
         "from concrete to conceptual:\n\n"
-        "1. **Top Co-Purchase Pairs** — a ranked table of the strongest aisle pairs (the answer most personas want)\n"
-        "2. **Department Heatmap** — a bird's-eye view of which categories overlap in orders\n"
-        "3. **Advanced** — the full aisle-level co-purchase network, with clusters and a focus selector"
+        "1. **Top Co-Purchase Pairs**, a ranked table of the strongest aisle pairs (the answer most personas want)\n"
+        "2. **Department Heatmap**, a bird's-eye view of which categories overlap in orders\n"
+        "3. **Advanced**, the full aisle-level co-purchase network, with clusters and a focus selector"
     )
 
     _render_lift_explainer()
@@ -33,15 +33,15 @@ def _render_lift_explainer():
         st.markdown(
             """
 For every pair of aisles, we count how many orders contain **both**, then
-compute the **lift** — how much more often they are bought together than
+compute the **lift**, how much more often they are bought together than
 random chance would predict.
 
 | Lift value | Meaning |
 |---|---|
-| **= 1.0** | No association — co-occurrence is pure coincidence |
-| **> 1.0** | Positive association — bought together more than expected |
-| **> 2.0** | Strong association — a good cross-sell candidate |
-| **> 3.0** | Very strong — nearly always purchased together |
+| **= 1.0** | No association, co-occurrence is pure coincidence |
+| **> 1.0** | Positive association, bought together more than expected |
+| **> 2.0** | Strong association, a good cross-sell candidate |
+| **> 3.0** | Very strong, nearly always purchased together |
 
 > Example: Lift of 2.5 for *fresh fruits + yogurt* means orders contain both
 > **2.5× more often** than chance would predict.
@@ -110,7 +110,7 @@ def _render_top_pairs():
     row = pairs_df.iloc[0]
     st.info(
         f"Strongest pair in the dataset: **{row['aisle_a']}** + "
-        f"**{row['aisle_b']}** with lift **{row['lift']:.2f}** — bought together "
+        f"**{row['aisle_b']}** with lift **{row['lift']:.2f}**, bought together "
         f"in {row['co_orders']:,} orders ({row['share_of_orders']:.2f}% of all). "
         "Strong-lift cross-department pairs (different *Dept A* and *Dept B*) "
         "are the most actionable cross-sell opportunities."
@@ -121,7 +121,7 @@ def _render_dept_heatmap():
     st.divider()
     st.subheader("2 · Department × Department Heatmap")
     st.caption(
-        "Bird's-eye view — how strongly each department co-occurs with every other "
+        "Bird's-eye view, how strongly each department co-occurs with every other "
         "in shared orders. Brighter = more aisle-pair co-purchases. "
         "The diagonal (a department with itself) is usually brightest: multiple "
         "aisles inside the same department naturally co-occur."
@@ -185,11 +185,11 @@ def _render_advanced_network():
         st.info(
             "**Why this is an exploratory view, not the primary one.** "
             "Force-directed networks look impressive but their node positions "
-            "carry no semantic meaning — they're a layout artefact (seed-dependent), "
+            "carry no semantic meaning, they're a layout artefact (seed-dependent), "
             "not data. For *static* communication of the same information, the "
             "**Top Pairs table** and the **Department Heatmap** above are the "
             "stronger choices: their position and colour encodings map directly "
-            "to data values. We've also deliberately left out a 3D variant — the "
+            "to data values. We've also deliberately left out a 3D variant, the "
             "third dimension would add visual complexity without carrying any "
             "additional information, and 3D screenshots are unusable in static "
             "reports."
@@ -207,7 +207,7 @@ def _render_advanced_network():
             "Show labels for top N aisles",
             5, 60, 20, step=5,
             help="Only the largest aisles get a visible label so the chart "
-                 "stays readable. Other aisles still appear as markers — "
+                 "stays readable. Other aisles still appear as markers, "
                  "hover them for details.",
         )
 

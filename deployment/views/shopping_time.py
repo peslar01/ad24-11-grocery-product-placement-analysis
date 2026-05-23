@@ -20,7 +20,7 @@ def render():
         "Darker cells mean more orders. The bars at the top sum each hour "
         "across all days; the bars on the right sum each day across all hours. "
         "Switch the **Customer type** toggle to compare *first-time* customers "
-        "(new arrivals) with *repeat* customers (returners) — the two groups "
+        "(new arrivals) with *repeat* customers (returners), the two groups "
         "often shop at different times."
     )
     st.caption(
@@ -168,7 +168,7 @@ def _render_insight(heatmap_data, orders_view, customer_type):
     # changes — not just the numbers.
     if customer_type == "First-time customers":
         recommendation = (
-            "First-time orders skew toward the *weekend* — these are people "
+            "First-time orders skew toward the *weekend*, these are people "
             "trying the service when they have time to set up an account. "
             "**Acquisition campaigns** targeting Saturday and early Sunday "
             "are likely to convert best."
@@ -176,7 +176,7 @@ def _render_insight(heatmap_data, orders_view, customer_type):
     elif customer_type == "Repeat customers":
         recommendation = (
             "Repeat orders cluster tightly around the weekly-grocery slot "
-            "— habitual customers planning the week. "
+            ", habitual customers planning the week. "
             "**Retention campaigns** (reorder reminders, basket pre-fills) "
             "should land on Saturday evening, just before the planning peak."
         )
@@ -196,6 +196,6 @@ def _render_insight(heatmap_data, orders_view, customer_type):
         f"The single hottest slot is **{peak_cell_day} {peak_cell_hour:02d}:00** "
         f"with {peak_cell_val:,} orders. "
         f"The top **6 hours** of the day absorb **{core_share:.0f}%** of all "
-        "orders — shopping is highly concentrated. "
+        "orders , shopping is highly concentrated. "
         + recommendation
     )

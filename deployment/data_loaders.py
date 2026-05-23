@@ -76,8 +76,8 @@ def load_csv():
 def dept_color_map():
     """Map each department to a fixed colour from a 26-colour qualitative palette.
 
-    Cached so the same colours are used in every chart — produce is always
-    teal, snacks always orange, etc. — across Top Sellers, Aisle view, and
+    Cached so the same colours are used in every chart, produce is always
+    teal, snacks always orange, etc. across Top Sellers, Aisle view, and
     the Treemap.
     """
     _, _, products_full, _ = load_csv()
@@ -90,7 +90,7 @@ def dept_color_map():
 def aisle_aggregates():
     """Pre-aggregate purchase count + reorder stats per (department, aisle).
 
-    Used by all Department Sales views — computed once, then reused. Returns a
+    Used by all Department Sales views, computed once, then reused. Returns a
     small DataFrame (134 rows) instead of repeatedly merging a 32M-row table.
     """
     _, _, products_full, order_products = load_csv()
@@ -116,7 +116,7 @@ def product_stats():
     """Per-product purchase count, reorder rate, and enrichment.
 
     Single source of truth for "how often is product X bought, and how loyal
-    are its customers?" — used by Top Sellers, Reorder Rate and Hidden Gems.
+    are its customers?", used by Top Sellers, Reorder Rate and Hidden Gems.
     Returns a DataFrame with columns:
         product_id, count, reorder_rate, share_pct,
         product_name, department, aisle
@@ -235,7 +235,7 @@ def dept_pair_matrix():
 
 @st.cache_data(show_spinner="Building the aisle network …")
 def build_aisle_network_data(min_count: int, min_lift: float, dim: int = 2):
-    """Heavy step — cached so slider/focus changes don't rerun it.
+    """Heavy step, cached so slider/focus changes don't rerun it.
 
     Returns the raw network data plus a layout (2D or 3D) so rendering the
     figure stays cheap.

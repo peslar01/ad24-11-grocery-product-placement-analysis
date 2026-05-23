@@ -97,6 +97,6 @@ def render():
         "**Produce** alone accounts for almost a third of all purchases, and most shopping "
         "happens on Sunday and Monday mornings. With an average of "
         f"**{avg_orders_per_customer:.0f} orders per customer** and a reorder rate of "
-        f"**{overall_reorder:.0%}**, the platform shows a highly habitual customer base — "
+        f"**{overall_reorder:.0%}**, the platform shows a highly habitual customer base, "
         "ideal conditions for loyalty-driven product strategies."
     )

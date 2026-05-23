@@ -11,7 +11,7 @@ def render():
     st.markdown(
         "The reorder rate is the share of a product's purchases that come from "
         "customers who had ordered it before. A high reorder rate indicates a "
-        "loyal, habitual customer base — strong candidates for subscription "
+        "loyal, habitual customer base, strong candidates for subscription "
         "offers, auto-reorder reminders, or staple-shelf placement."
     )
 
@@ -46,7 +46,7 @@ def render():
 
     st.caption(
         f"**{eligible_count:,}** products meet the threshold of "
-        f"≥ {min_purchases:,} purchases — showing the top {len(top_reorder)} "
+        f"≥ {min_purchases:,} purchases, showing the top {len(top_reorder)} "
         "by reorder rate."
     )
 
@@ -104,7 +104,7 @@ def render():
         f"followed by {runners_up}. "
         f"Of the top {len(top_reorder)} products, **{dom_count}** come from "
         f"the *{dom_name}* department, and **{high_share}** have a reorder "
-        "rate above **0.8** — the threshold above which products tend to "
+        "rate above **0.8**, the threshold above which products tend to "
         "be everyday staples and become strong candidates for "
         "**subscription models** or **auto-reorder reminders**."
     )
