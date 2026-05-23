@@ -91,7 +91,7 @@ def _render_department_view(agg):
         f"**{int(top1['count']):,}** purchases ({top1['share_pct']:.1f}% of all), "
         f"followed by **{top2['department'].title()}** ({top2['share_pct']:.1f}%). "
         f"The highest reorder rate is in **{most_loyal['department']}** "
-        f"({most_loyal['reorder_rate']:.0%}) — its customers are the most habitual, "
+        f"({most_loyal['reorder_rate']:.0%}), its customers are the most habitual, "
         "regardless of total volume. Colour intensity in the chart encodes the "
         "reorder rate so loyalty leaders stand out from volume leaders."
     )
@@ -164,7 +164,7 @@ def _render_aisle_view(agg):
             f"({top_aisle['share_pct']:.2f}% of all) and a reorder rate of "
             f"**{top_aisle['reorder_rate']:.0%}**. "
             f"Highest reorder rate in this view: **{high_reord['aisle']}** "
-            f"({high_reord['reorder_rate']:.0%}) — strongest loyalty signal."
+            f"({high_reord['reorder_rate']:.0%}),s strongest loyalty signal."
         )
     else:
         st.info(

@@ -50,7 +50,7 @@ The variables used in the analysis fall into the following groups:
 
 #### Entity Relationship Diagram
 
-```mermaid
+```{mermaid}
 erDiagram
     ORDERS ||--o{ ORDER_PRODUCTS_PRIOR : contains
     PRODUCTS ||--o{ ORDER_PRODUCTS_PRIOR : referenced_by
@@ -290,7 +290,7 @@ The heavy counting step (`compute_aisle_pairs`) runs once and is cached by Strea
 
 ## Exploratory Analysis
 
-The full analysis is documented in `eda/eda.ipynb`. Rather than listing findings as bullet points, this section asks the four questions that drove the dashboard's design and shows the data behind each answer. The goal is to make the path from raw numbers to business decision visible — what was found, why it matters, and how it is reflected in the final product.
+The underlying exploratory work is in `eda/eda.ipynb`. Rather than listing findings as bullet points, this section asks the four questions that drove the dashboard's design and shows the data behind each answer. The goal is to make the path from raw numbers to business decision visible, what was found, why it matters, and how it is reflected in the final product.
 
 ### What sells?
 
@@ -337,7 +337,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-Bananas are the single most-purchased product by a wide margin. Thirteen of the top 20 carry an organic label, pointing to a platform-wide preference for fresh and organic produce that goes beyond individual product popularity. This skew shapes the department picture as well: @fig-dept-sales shows that Produce alone accounts for nearly nine million purchases — almost twice as many as the next largest department, Dairy & Eggs.
+Bananas are the single most-purchased product by a wide margin. Thirteen of the top 20 carry an organic label, pointing to a platform-wide preference for fresh and organic produce that goes beyond individual product popularity. This skew shapes the department picture as well: @fig-dept-sales shows that Produce alone accounts for nearly nine million purchases, almost twice as many as the next largest department, Dairy & Eggs.
 
 ```{python}
 #| label: fig-dept-sales
@@ -386,11 +386,11 @@ plt.show()
 
 Produce and Dairy & Eggs are the two anchor departments. Snacks and Beverages follow at a considerable distance; departments like Bulk, Other, and Alcohol rarely appear in orders on this platform.
 
-**For assortment planners:** These two charts form the non-negotiable baseline. Produce and Dairy & Eggs are not just popular — they are the reason customers open the app. Any assortment change that touches either carries outsized risk. The **Top Sellers** and **Department Sales** views in the dashboard present exactly this data in an interactive format that can be filtered and explored before planning meetings.
+**For assortment planners:** These two charts form the non-negotiable baseline. Produce and Dairy & Eggs are not just popular, they are the reason customers open the app. Any assortment change that touches either carries outsized risk. The **Top Sellers** and **Department Sales** views in the dashboard present exactly this data in an interactive format that can be filtered and explored before planning meetings.
 
 ### Who keeps coming back?
 
-Purchase frequency tells us what sells; reorder rate tells us who stays. @fig-reorder-rate ranks the products with the highest reorder rates among items purchased at least 500 times — the minimum to make the rate statistically meaningful.
+Purchase frequency tells us what sells; reorder rate tells us who stays. @fig-reorder-rate ranks the products with the highest reorder rates among items purchased at least 500 times, the minimum to make the rate statistically meaningful.
 
 ```{python}
 #| label: fig-reorder-rate
@@ -437,7 +437,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-Every product in the top 20 exceeds 80% reorder rate: customers who buy them once buy them again, predictably. The list is dominated by everyday staples — milk, water, bananas — where purchasing is habitual rather than exploratory. This is the platform's loyalty core.
+Every product in the top 20 exceeds 80% reorder rate: customers who buy them once buy them again, predictably. The list is dominated by everyday staples, milk, water, bananas, where purchasing is habitual rather than exploratory. This is the platform's loyalty core.
 
 Strong reorder rates are not, however, exclusive to bestsellers. @fig-hidden-gems plots reorder rate against purchase volume for every product with at least 100 purchases, separating the five highest-volume departments from the rest of the assortment.
 
@@ -501,13 +501,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-Hundreds of low-volume products outside the dominant departments exceed the platform's overall reorder rate of roughly 58%. These are the hidden gems of the assortment: niche items — specialty wines, artisan breads, premium deli meats — with small but highly loyal customer bases that standard sales reports make invisible.
+Hundreds of low-volume products outside the dominant departments exceed the platform's overall reorder rate of roughly 58%. These are the hidden gems of the assortment: niche items, specialty wines, artisan breads, premium deli meats, with small but highly loyal customer bases that standard sales reports make invisible.
 
-**For buyers:** A supplier negotiation requires more than a top-seller list. The scatter above makes a quantitative case for products that score on loyalty rather than volume — the starting point for targeted promotions, subscription nudges, or retention-focused campaigns. The dashboard's **Reorder Rate** and **Hidden Gems** views make this analysis interactive and filterable.
+**For buyers:** A supplier negotiation requires more than a top-seller list. The scatter above makes a quantitative case for products that score on loyalty rather than volume, the starting point for targeted promotions, subscription nudges, or retention-focused campaigns. The dashboard's **Reorder Rate** and **Hidden Gems** views make this analysis interactive and filterable.
 
 ### What belongs next to what?
 
-Raw co-purchase counts tell us which categories are large — not which ones genuinely belong together. When Produce appears in every top department pair, that reflects its size, not a meaningful affinity. Replacing raw frequency with **lift** removes this size bias: a lift of 2.0 means a pair appears together twice as often as chance would predict given each category's individual popularity. @fig-aisle-lift shows the 15 strongest aisle-level associations by lift, restricted to pairs with at least 2,000 shared orders to exclude fragile combinations.
+Raw co-purchase counts tell us which categories are large, not which ones genuinely belong together. When Produce appears in every top department pair, that reflects its size, not a meaningful affinity. Replacing raw frequency with **lift** removes this size bias: a lift of 2.0 means a pair appears together twice as often as chance would predict given each category's individual popularity. @fig-aisle-lift shows the 15 strongest aisle-level associations by lift, restricted to pairs with at least 2,000 shared orders to exclude fragile combinations.
 
 ```{python}
 #| label: fig-aisle-lift
@@ -581,11 +581,11 @@ plt.show()
 
 The lift ranking reveals three clear shopping-basket themes that raw counts miss entirely. Wine aisles dominate the top: red and white wines are bought together roughly 40 times more often than chance would predict. Below the alcohol cluster, a personal care theme emerges (oral hygiene, deodorants, hair care), followed by a baking cluster (baking supplies paired with dough and mixes) and a household cleaning cluster (laundry with cleaning products). None of these relationships would surface from a frequency ranking, where every top pair would simply include Produce.
 
-This aisle-level lift analysis is the analytical foundation of the dashboard's **Aisles Bought Together** page. The shopping-basket themes visible in the bar chart correspond directly to the colour-coded communities in the interactive network graph — the chart and the network are two views of the same underlying structure.
+This aisle-level lift analysis is the analytical foundation of the dashboard's **Aisles Bought Together** page. The shopping-basket themes visible in the bar chart correspond directly to the colour-coded communities in the interactive network graph, the chart and the network are two views of the same underlying structure.
 
 ### When do customers shop?
 
-The dataset records no absolute calendar dates, only day of week and hour of day. @fig-shopping-heatmap encodes order volume across both dimensions simultaneously — a pattern that any single average or marginal distribution would obscure.
+The dataset records no absolute calendar dates, only day of week and hour of day. @fig-shopping-heatmap encodes order volume across both dimensions simultaneously, a pattern that any single average or marginal distribution would obscure.
 
 ```{python}
 #| label: fig-shopping-heatmap
@@ -633,13 +633,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-Orders cluster sharply on Sundays and Mondays between 09:00 and 15:00 — the weekly grocery planning window. Activity drops near zero before 06:00 and after 22:00 on every day of the week. The peak is not a gradual rise but a concentrated band, consistent with deliberate weekly planning rather than impulsive shopping. Promotional campaigns timed to this window reach customers when they are actively placing orders; late-evening promotions would find almost no audience.
+Orders cluster sharply on Sundays and Mondays between 09:00 and 15:00, the weekly grocery planning window. Activity drops near zero before 06:00 and after 22:00 on every day of the week. The peak is not a gradual rise but a concentrated band, consistent with deliberate weekly planning rather than impulsive shopping. Promotional campaigns timed to this window reach customers when they are actively placing orders; late-evening promotions would find almost no audience.
 
 ### From data to decisions
 
 The four findings above describe the same customer from different angles: a habitual, health-conscious buyer who anchors every visit in Produce and Dairy, shops on a predictable Sunday-to-Monday morning schedule, builds strong routines around a handful of staples, and occasionally discovers a niche product they then purchase repeatedly.
 
-The dashboard is designed to make exactly these patterns accessible without requiring either Sandra or Marco to run queries or produce charts themselves. Each page in the dashboard corresponds directly to one of the four questions answered here: **Top Sellers** and **Department Sales** for volume, **Reorder Rate** and **Hidden Gems** for loyalty, **Aisles Bought Together** for co-purchase structure, and **Shopping Time Heatmap** for temporal patterns. The exploratory analysis is not separate from the product — it is the product, made interactive.
+The dashboard is designed to make exactly these patterns accessible without requiring either Sandra or Marco to run queries or produce charts themselves. Each page in the dashboard corresponds directly to one of the four questions answered here: **Top Sellers** and **Department Sales** for volume, **Reorder Rate** and **Hidden Gems** for loyalty, **Aisles Bought Together** for co-purchase structure, and **Shopping Time Heatmap** for temporal patterns. The exploratory analysis is not separate from the product, it is the product, made interactive.
 
 ## Summary
 

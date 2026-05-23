@@ -10,7 +10,7 @@ def render():
     st.title("Top Products by Number of Purchases")
     st.markdown(
         "Shows the most frequently purchased individual products across all orders. "
-        "Filter by department to find the top sellers within a single category — "
+        "Filter by department to find the top sellers within a single category, "
         "useful for product managers focused on a specific assortment."
     )
 
@@ -94,7 +94,7 @@ def render():
             f"({top1['share_pct']:.2f}% of all) and a reorder rate of "
             f"**{top1['reorder_rate']:.0%}**, followed by {runners_up}. "
             f"Of the shown top {len(top_products)} products, "
-            f"**{dom_count}** come from the *{dom_dept}* department — "
+            f"**{dom_count}** come from the *{dom_dept}* department, "
             "fresh products clearly dominate the platform's top sellers."
         )
     else:
@@ -103,6 +103,6 @@ def render():
             f"**{top1['product_name']}** with {int(top1['count']):,} purchases "
             f"({top1['share_pct']:.2f}% of all platform purchases, "
             f"reorder rate **{top1['reorder_rate']:.0%}**). "
-            "Hover the bars for share-% and reorder-rate of each product — "
+            "Hover the bars for share-% and reorder-rate of each product, "
             "products with a high reorder rate are strong subscription candidates."
         )

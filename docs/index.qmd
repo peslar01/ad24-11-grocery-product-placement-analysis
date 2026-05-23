@@ -6,10 +6,10 @@ title: "Overview"
 
 This documentation describes the conception and development of a data
 visualisation product created for the module *Visualisation and Data Science
-Storytelling II* (ZHAW, FS 2025/26) by Group 11 (Lara Pestrin, Jonathan Kull,
+Storytelling* (ZHAW, FS 2025/26) by Group 11 (Lara Pestrin, Jonathan Kull,
 Veprim Mehmeti).
 
-The project — **Grocery Product Placement Analysis** — analyses the Instacart
+The project, **Grocery Product Placement Analysis**, analyses the Instacart
 Online Grocery Shopping Dataset (2017) to uncover actionable patterns in
 grocery purchasing behaviour. Effective product placement is one of the most
 impactful levers available to retailers, yet decisions are often made on
