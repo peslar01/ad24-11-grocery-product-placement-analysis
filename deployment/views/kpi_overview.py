@@ -60,22 +60,30 @@ def render():
     peak_label = f"{day_names[peak_dh[0]]}, {peak_dh[1]:02d}:00"
 
     # ── Metric grid ──────────────────────────────────────────────────────────
+    # Verwendet st.markdown statt st.metric für bessere Versionskompatibilität
+    def kpi_card(col, label, value):
+        col.markdown(
+            f"<div style='background:#1e2130;padding:16px 20px;border-radius:8px;"
+            f"border-left:4px solid #4a7c59;margin-bottom:8px'>"
+            f"<div style='color:#9ba8b5;font-size:0.82em;margin-bottom:4px'>{label}</div>"
+            f"<div style='font-size:1.6em;font-weight:700;color:#ffffff'>{value}</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total Orders",     f"{total_orders:,}")
-    col2.metric("Unique Products",  f"{unique_products:,}")
-    col3.metric("Unique Customers", f"{unique_customers:,}")
+    kpi_card(col1, "Total Orders",     f"{total_orders:,}")
+    kpi_card(col2, "Unique Products",  f"{unique_products:,}")
+    kpi_card(col3, "Unique Customers", f"{unique_customers:,}")
 
     col4, col5, col6 = st.columns(3)
-    col4.metric("Overall Reorder Rate", f"{overall_reorder:.1%}")
-    col5.metric("Avg Orders / Customer", f"{avg_orders_per_customer:.1f}")
-    col6.metric("Avg Products / Order",  f"{avg_basket_size:.1f}")
+    kpi_card(col4, "Overall Reorder Rate",   f"{overall_reorder:.1%}")
+    kpi_card(col5, "Avg Orders / Customer",  f"{avg_orders_per_customer:.1f}")
+    kpi_card(col6, "Avg Products / Order",   f"{avg_basket_size:.1f}")
 
     col7, col8 = st.columns(2)
-    col7.metric(
-        "Top Department",
-        f"{top_department.title()} ({top_dept_share:.0%})",
-    )
-    col8.metric("Peak Shopping Time", peak_label)
+    kpi_card(col7, "Top Department", f"{top_department.title()} ({top_dept_share:.0%})")
+    kpi_card(col8, "Peak Shopping Time", peak_label)
 
     # ── Mini chart: top 5 departments by share ───────────────────────────────
     st.divider()
