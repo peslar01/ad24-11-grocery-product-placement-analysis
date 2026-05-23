@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
-from data_loaders import load_csv
+from data_loaders import _RAW_AVAILABLE, load_csv, load_shopping_heatmap
 
 
 _DAY_NAMES = [
@@ -28,8 +28,6 @@ def render():
         "so the week starts on Sunday here. Times are local to each customer."
     )
 
-    orders, _, _, _ = load_csv()
-
     # ── Customer-type toggle (analytical depth) ─────────────────────────────
     customer_type = st.radio(
         "Customer type",
@@ -42,28 +40,35 @@ def render():
         ),
     )
 
-    if customer_type == "First-time customers":
-        orders_view = orders[orders["order_number"] == 1]
-    elif customer_type == "Repeat customers":
-        orders_view = orders[orders["order_number"] > 1]
-    else:
-        orders_view = orders
+    if _RAW_AVAILABLE:
+        # ── Raw-Data-Modus: direkt aus orders.csv berechnen ─────────────────
+        orders, _, _, _ = load_csv()
 
-    # Robust pivot: explicit reindex against the full 7×24 grid so missing
-    # day/hour combinations come back as 0 instead of silently disappearing
-    # (relevant when filtering to a small subset like first-time customers).
-    heatmap_data = (
-        orders_view.groupby(["order_dow", "order_hour_of_day"])["order_id"]
-        .count()
-        .unstack(fill_value=0)
-        .reindex(index=range(7), columns=range(24), fill_value=0)
-    )
-    heatmap_data.index = _DAY_NAMES
+        if customer_type == "First-time customers":
+            orders_view = orders[orders["order_number"] == 1]
+        elif customer_type == "Repeat customers":
+            orders_view = orders[orders["order_number"] > 1]
+        else:
+            orders_view = orders
+
+        heatmap_data = (
+            orders_view.groupby(["order_dow", "order_hour_of_day"])["order_id"]
+            .count()
+            .unstack(fill_value=0)
+            .reindex(index=range(7), columns=range(24), fill_value=0)
+        )
+        heatmap_data.index = _DAY_NAMES
+        n_orders_in_view = int(orders_view["order_id"].nunique())
+
+    else:
+        # ── Precomputed-Modus: voraggerierter Pivot ──────────────────────────
+        heatmap_data   = load_shopping_heatmap(customer_type)
+        n_orders_in_view = int(heatmap_data.values.sum())
 
     fig = _build_figure(heatmap_data)
     st.plotly_chart(fig, width='stretch')
 
-    _render_insight(heatmap_data, orders_view, customer_type)
+    _render_insight(heatmap_data, n_orders_in_view, customer_type)
 
 
 def _build_figure(heatmap_data):
@@ -139,7 +144,7 @@ def _build_figure(heatmap_data):
     return fig
 
 
-def _render_insight(heatmap_data, orders_view, customer_type):
+def _render_insight(heatmap_data, n_total, customer_type):
     """Compute peaks + concentration from the data and render the info box."""
     if heatmap_data.values.sum() == 0:
         st.warning("No orders match the current customer-type filter.")
@@ -161,8 +166,6 @@ def _render_insight(heatmap_data, orders_view, customer_type):
     # Concentration: how heavy is the busiest single hour-band?
     top6_hours = hour_totals.nlargest(6).sum()
     core_share = top6_hours / hour_totals.sum() * 100
-
-    n_total = int(orders_view["order_id"].nunique())
 
     # Tailor the recommendation to the customer type so the text actually
     # changes — not just the numbers.

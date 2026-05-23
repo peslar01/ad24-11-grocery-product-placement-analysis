@@ -20,7 +20,7 @@ Run it:
 
 import streamlit as st
 
-from data_loaders import CSV_FILES, DATA_DIR
+from data_loaders import CSV_FILES, DATA_DIR, _RAW_AVAILABLE, _PRECOMPUTED_AVAILABLE
 from views import (
     department_sales,
     hidden_gems,
@@ -60,12 +60,13 @@ elif section == "Customer Retention":
         ["Reorder Rate", "Hidden Gems", "Shopping Time Heatmap"],
     )
 
-# ── Guard: missing CSV files ──────────────────────────────────────────────────
-missing_csv = [f for f in CSV_FILES if not (DATA_DIR / f).exists()]
-if missing_csv:
+# ── Guard: weder Raw-CSVs noch voraggerierte Daten vorhanden ──────────────────
+if not _RAW_AVAILABLE and not _PRECOMPUTED_AVAILABLE:
+    missing_csv = [f for f in CSV_FILES if not (DATA_DIR / f).exists()]
     st.error(
         f"Missing CSV files in `{DATA_DIR}`: {', '.join(missing_csv)}\n\n"
-        "Please run the **data_acquisition** notebook first."
+        "Either run the **data_acquisition** notebook to get the raw data, "
+        "or run `deployment/precompute.py` to generate the precomputed data files."
     )
     st.stop()
 

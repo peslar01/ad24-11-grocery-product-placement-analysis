@@ -131,7 +131,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#data folder
+#data folder (raw, 2.8 GB — nicht ins Repo)
 data/
+
+# Voraggerierte Deployment-Daten werden BEWUSST committed (nicht ignorieren)
+# deployment/data_precomputed/ ist kein Fehler — diese Dateien sollen ins Repo
 /.quarto/
 **/*.quarto_ipynb

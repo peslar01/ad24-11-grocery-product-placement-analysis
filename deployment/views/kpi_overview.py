@@ -3,7 +3,7 @@
 import plotly.express as px
 import streamlit as st
 
-from data_loaders import load_csv
+from data_loaders import _RAW_AVAILABLE, load_csv, load_kpi
 
 
 def render():
@@ -16,31 +16,47 @@ def render():
         "**Customer Retention** to understand who keeps coming back."
     )
 
-    orders, products, products_full, order_products = load_csv()
+    if _RAW_AVAILABLE:
+        # ── Raw-Data-Modus: direkt aus CSVs berechnen ────────────────────────
+        orders, products, products_full, order_products = load_csv()
 
-    # ── Scale ────────────────────────────────────────────────────────────────
-    total_orders     = orders["order_id"].nunique()
-    unique_products  = products["product_id"].nunique()
-    unique_customers = orders["user_id"].nunique()
+        total_orders     = orders["order_id"].nunique()
+        unique_products  = products["product_id"].nunique()
+        unique_customers = orders["user_id"].nunique()
 
-    # ── Behaviour ────────────────────────────────────────────────────────────
-    overall_reorder         = order_products["reordered"].mean()
-    avg_orders_per_customer = total_orders / unique_customers
-    avg_basket_size         = order_products.groupby("order_id").size().mean()
+        overall_reorder         = order_products["reordered"].mean()
+        avg_orders_per_customer = total_orders / unique_customers
+        avg_basket_size         = order_products.groupby("order_id").size().mean()
 
-    # ── Preferences ──────────────────────────────────────────────────────────
-    dept_purchases = (
-        order_products
-        .merge(products_full[["product_id", "department"]], on="product_id")
-        .groupby("department")
-        .size()
-    )
-    dept_share     = dept_purchases / dept_purchases.sum()
-    top_department = dept_share.idxmax()
-    top_dept_share = dept_share.max()
+        dept_purchases = (
+            order_products
+            .merge(products_full[["product_id", "department"]], on="product_id")
+            .groupby("department")
+            .size()
+        )
+        dept_share     = dept_purchases / dept_purchases.sum()
+        top_department = dept_share.idxmax()
+        top_dept_share = dept_share.max()
 
-    peak_dh   = orders.groupby(["order_dow", "order_hour_of_day"]).size().idxmax()
-    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        peak_dh = orders.groupby(["order_dow", "order_hour_of_day"]).size().idxmax()
+
+    else:
+        # ── Precomputed-Modus: voraggerierte Dateien laden ───────────────────
+        kpi, dept_share = load_kpi()
+
+        total_orders            = kpi["total_orders"]
+        unique_products         = kpi["unique_products"]
+        unique_customers        = kpi["unique_customers"]
+        overall_reorder         = kpi["overall_reorder"]
+        avg_orders_per_customer = kpi["avg_orders_per_customer"]
+        avg_basket_size         = kpi["avg_basket_size"]
+        top_department          = kpi["top_department"]
+        top_dept_share          = kpi["top_dept_share"]
+        peak_dh                 = (kpi["peak_dow"], kpi["peak_hour"])
+
+    # ── Peak-Label (gemeinsam für beide Modi) ─────────────────────────────────
+    day_names  = ["Sunday", "Monday", "Tuesday", "Wednesday",
+                  "Thursday", "Friday", "Saturday"]
     peak_label = f"{day_names[peak_dh[0]]}, {peak_dh[1]:02d}:00"
 
     # ── Metric grid ──────────────────────────────────────────────────────────
