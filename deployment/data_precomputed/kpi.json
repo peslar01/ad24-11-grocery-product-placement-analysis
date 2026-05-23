@@ -1,0 +1,12 @@
+{
+  "total_orders": 3421083,
+  "unique_products": 49688,
+  "unique_customers": 206209,
+  "overall_reorder": 0.5896974667922161,
+  "avg_orders_per_customer": 16.590367054784224,
+  "avg_basket_size": 10.088883421247614,
+  "top_department": "produce",
+  "top_dept_share": 0.2922596067414535,
+  "peak_dow": 1,
+  "peak_hour": 10
+}
