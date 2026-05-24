@@ -25,9 +25,17 @@ Raw and processed data files are stored in the `data/` folder.
 
 See section `Quarto Setup and Usage` for instructions on how to build and serve the documentation website using Quarto.
 
-The rendered documentation website (Project Charta, Data Report, and Dashboard) is hosted on GitHub Pages and can be accessed here:
+The rendered documentation website (Project Charta and Data Report) is hosted on GitHub Pages:
 
-[Project Repository and Documentation on GitHub](https://github.com/peslar01/ad24-11-grocery-product-placement-analysis.git)
+[Documentation on GitHub Pages](https://podsv-fs26-ad24.github.io/ad24-11-grocery-product-placement-analysis/)
+
+The interactive dashboard is deployed on Streamlit Cloud:
+
+[Live Dashboard on Streamlit Cloud](https://ad24-11-grocery-appuct-placement-analysis-fesw7jgvsqopq9xsrtid.streamlit.app)
+
+The project repository is on GitHub:
+
+[Project Repository](https://github.com/podsv-fs26-ad24/ad24-11-grocery-product-placement-analysis)
 
 ## Python Environment Setup and Management with uv
 Make sure to have uv installed: https://docs.astral.sh/uv/getting-started/installation/
